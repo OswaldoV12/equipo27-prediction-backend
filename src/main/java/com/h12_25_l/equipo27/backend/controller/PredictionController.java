@@ -1,5 +1,7 @@
 package com.h12_25_l.equipo27.backend.controller;
 
+import com.h12_25_l.equipo27.backend.dto.PredictRequestDTO;
+import com.h12_25_l.equipo27.backend.service.PredictionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class PredictionController {
 
-    private final PredictionService predictionService; //aca falta crear el archivo
+    private final PredictionService predictionService; //no tiene logica aún
 
     @PostMapping("/predict")
     public ResponseEntity<?> predict(@RequestBody @Valid PredictRequestDTO request) {
