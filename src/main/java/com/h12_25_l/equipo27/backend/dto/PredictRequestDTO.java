@@ -1,24 +1,24 @@
 package com.h12_25_l.equipo27.backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
 
 public record PredictRequestDTO(
         @NotBlank(message = "La aerolínea es obligatoria")
-        @Size(min = 2, max = 3, message = "La aerolínea debe tener entre 2 y 3 caracteres")
+        @Pattern(regexp = "^[A-Z]{2}$",
+                message = "La aerolínea debe tener 2 letras mayúsculas (ej: AZ)")
         String aerolinea,
 
         @NotBlank(message = "El aeropuerto de origen es obligatorio")
-        @Size(min = 3, max = 3, message = "El código IATA de origen debe tener 3 letras")
+        @Pattern(regexp = "^[A-Z]{3}$",
+                message = "El código de aeropuerto debe tener 3 letras mayúsculas (ej: GIG)")
         String origen,
 
         @NotBlank(message = "El aeropuerto de destino es obligatorio")
-        @Size(min = 3, max = 3, message = "El código IATA de destino debe tener 3 letras")
+        @Pattern(regexp = "^[A-Z]{3}$",
+                message = "El código de aeropuerto debe tener 3 letras mayúsculas (ej: GRU)")
         String destino,
 
         @NotNull(message = "La fecha de partida es obligatoria")
