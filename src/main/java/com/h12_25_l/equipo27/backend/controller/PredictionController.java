@@ -1,25 +1,34 @@
 package com.h12_25_l.equipo27.backend.controller;
 
 import com.h12_25_l.equipo27.backend.dto.PredictRequestDTO;
-import com.h12_25_l.equipo27.backend.service.PredictionService;
+import com.h12_25_l.equipo27.backend.dto.PredictRequestDetails;
+import com.h12_25_l.equipo27.backend.model.PredictionRequest;
+import com.h12_25_l.equipo27.backend.repository.PredictionRepository;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
-@RequestMapping("/api")
-@AllArgsConstructor
+@RequestMapping("/predict")
 public class PredictionController {
 
-    private final PredictionService predictionService; //no tiene logica aún
+    @Autowired
+    private PredictionRepository repository;  //no tiene logica aún
 
-    @PostMapping("/predict")
-    public ResponseEntity<?> predict(@RequestBody @Valid PredictRequestDTO request) {
-        var response = predictionService.predict(request);
-        return ResponseEntity.ok(response);
+    @Transactional
+    @PostMapping
+    public ResponseEntity registrar(@RequestBody @Valid PredictRequestDTO datos, UriComponentsBuilder uriComponentsBuilder) {
+        var request = new PredictionRequest(datos);
+        repository.save(request);
+
+        var uri = uriComponentsBuilder.path("/predict/{id}").buildAndExpand(request.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(new PredictRequestDetails(request));
     }
 }
