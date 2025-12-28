@@ -12,10 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-@AllArgsConstructor
 public class PredictionController {
 
     private final PredictionService predictionService; //no tiene logica aún
+
+    public PredictionController (PredictionService predictionService){
+        this.predictionService = predictionService;
+    }
 
     @PostMapping("/predict")
     public ResponseEntity<?> predict(@RequestBody @Valid PredictRequestDTO request) {
