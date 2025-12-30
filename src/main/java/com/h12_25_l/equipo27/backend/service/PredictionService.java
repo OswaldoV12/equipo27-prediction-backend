@@ -75,7 +75,7 @@ public class PredictionService {
                 .orElseThrow(() -> new ValidationException("Aeropuerto destino no encontrado: " + request.destino()));
 
         // Crear y guardar Vuelo
-        Vuelo vuelo = new Vuelo(aerolinea, origen, destino, request.fechaPartida(), request.distanciaKm());
+        Vuelo vuelo = new Vuelo(aerolinea, origen, destino, request.fecha_partida(), request.distancia_km());
         vueloRepository.save(vuelo);
 
         // Crear y guardar Prediccion

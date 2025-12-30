@@ -29,10 +29,10 @@ public record PredictRequestDTO(
 
         @NotNull(message = "La fecha de partida es obligatoria")
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        LocalDateTime fechaPartida,
+        LocalDateTime fecha_partida,
 
         @NotNull(message = "La distancia es obligatoria")
         @Positive(message = "La distancia debe ser mayor a 0")
-        Integer distanciaKm
+        Integer distancia_km
 ) {}
 
