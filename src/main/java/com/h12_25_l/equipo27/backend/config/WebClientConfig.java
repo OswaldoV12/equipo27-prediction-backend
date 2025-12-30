@@ -10,7 +10,7 @@ public class WebClientConfig {
     public WebClient webClient() {
         return WebClient.builder()
                 .baseUrl("http://localhost:" +
-                        "8001")
+                        "8000")
                 .build();
     }
 }
