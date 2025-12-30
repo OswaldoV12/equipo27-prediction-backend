@@ -19,6 +19,10 @@ public class PredictionController {
         this.predictionService = predictionService;
     }
 
+    public PredictionController (PredictionService predictionService){
+        this.predictionService = predictionService;
+    }
+
     @PostMapping("/predict")
     public ResponseEntity<?> predict(@RequestBody @Valid PredictRequestDTO request) {
         var response = predictionService.predict(request);
