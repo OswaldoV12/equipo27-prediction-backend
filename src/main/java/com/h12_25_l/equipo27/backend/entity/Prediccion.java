@@ -1,11 +1,17 @@
 package com.h12_25_l.equipo27.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "prediccion")
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Prediccion {
 
     @Id
@@ -28,59 +34,5 @@ public class Prediccion {
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
-    }
-
-    // Constructor vacío (necesario para JPA)
-    public Prediccion() {
-    }
-
-    //constructor
-    public Prediccion(Vuelo vuelo, String prevision, Double probabilidad) {
-        this.vuelo = vuelo;
-        this.prevision = prevision;
-        this.probabilidad = probabilidad;
-        // createdAt se asigna automáticamente por @PrePersist
-    }
-
-    // getters / setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Vuelo getVuelo() {
-        return vuelo;
-    }
-
-    public void setVuelo(Vuelo vuelo) {
-        this.vuelo = vuelo;
-    }
-
-    public String getPrevision() {
-        return prevision;
-    }
-
-    public void setPrevision(String prevision) {
-        this.prevision = prevision;
-    }
-
-    public Double getProbabilidad() {
-        return probabilidad;
-    }
-
-    public void setProbabilidad(Double probabilidad) {
-        this.probabilidad = probabilidad;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }
