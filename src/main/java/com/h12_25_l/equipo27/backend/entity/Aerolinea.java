@@ -2,6 +2,7 @@ package com.h12_25_l.equipo27.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Aerolinea {
 
     @Id
@@ -21,5 +23,11 @@ public class Aerolinea {
 
     @Column(length = 3, nullable = false, unique = true)
     private String iata; // código de 2-3 letras
+
+    // Constructor con nombre e IATA
+    public Aerolinea(String nombre, String iata) {
+        this.nombre = nombre;
+        this.iata = iata;
+    }
 }
 

@@ -2,6 +2,7 @@ package com.h12_25_l.equipo27.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Prediccion {
 
     @Id
@@ -34,5 +36,13 @@ public class Prediccion {
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    //constructor
+    public Prediccion(Vuelo vuelo, String prevision, Double probabilidad) {
+        this.vuelo = vuelo;
+        this.prevision = prevision;
+        this.probabilidad = probabilidad;
+        // createdAt se asigna automáticamente por @PrePersist
     }
 }
