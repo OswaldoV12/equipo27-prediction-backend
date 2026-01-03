@@ -64,7 +64,7 @@ server:
 4. Ejecutar la clase principal:
 
 ```
-FlightOnTimeApplication.java
+PredictionBackendApiApplication.java
 ```
 
 5. La API estará disponible en:
