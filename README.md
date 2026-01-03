@@ -42,6 +42,7 @@ La API actúa como **puente** entre los datos del vuelo y el modelo predictivo.
 * Spring Boot
 * Spring Web
 * Spring Data JPA
+* Database (H2 / PostgreSQL)
 * JUnit 5 + Mockito
 * Swagger
 * Postman
