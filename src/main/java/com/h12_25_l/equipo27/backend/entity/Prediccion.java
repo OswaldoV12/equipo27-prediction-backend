@@ -1,11 +1,20 @@
 package com.h12_25_l.equipo27.backend.entity;
 
+import com.h12_25_l.equipo27.backend.enums.TipoPrevision;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "prediccion")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Prediccion {
 
     @Id
@@ -17,7 +26,8 @@ public class Prediccion {
     private Vuelo vuelo;
 
     @Column(nullable = false)
-    private String prevision;
+    @Enumerated(EnumType.STRING)
+    private TipoPrevision prevision;
 
     @Column(nullable = false)
     private Double probabilidad;
@@ -30,57 +40,12 @@ public class Prediccion {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Constructor vacío (necesario para JPA)
-    public Prediccion() {
-    }
-
     //constructor
-    public Prediccion(Vuelo vuelo, String prevision, Double probabilidad) {
+    public Prediccion(Vuelo vuelo, TipoPrevision prevision, Double probabilidad) {
         this.vuelo = vuelo;
         this.prevision = prevision;
         this.probabilidad = probabilidad;
         // createdAt se asigna automáticamente por @PrePersist
     }
 
-    // getters / setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Vuelo getVuelo() {
-        return vuelo;
-    }
-
-    public void setVuelo(Vuelo vuelo) {
-        this.vuelo = vuelo;
-    }
-
-    public String getPrevision() {
-        return prevision;
-    }
-
-    public void setPrevision(String prevision) {
-        this.prevision = prevision;
-    }
-
-    public Double getProbabilidad() {
-        return probabilidad;
-    }
-
-    public void setProbabilidad(Double probabilidad) {
-        this.probabilidad = probabilidad;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }
