@@ -1,5 +1,6 @@
 package com.h12_25_l.equipo27.backend.service;
 
+import com.h12_25_l.equipo27.backend.dto.AerolineaDTO;
 import com.h12_25_l.equipo27.backend.entity.Aerolinea;
 import com.h12_25_l.equipo27.backend.repository.AerolineaRepository;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,13 @@ public class AerolineaService {
         this.aerolineaRepository = aerolineaRepository;
     }
 
-    public List<Aerolinea> listarTodas() {
-        return aerolineaRepository.findAll();
+    public List<AerolineaDTO> listarTodas() {
+        return aerolineaRepository.findAll()
+                .stream()
+                .map(a -> new AerolineaDTO(
+                        a.getIata(),
+                        a.getNombre()
+                ))
+                .toList();
     }
 }

@@ -3,6 +3,7 @@ package com.h12_25_l.equipo27.backend.service;
 import com.h12_25_l.equipo27.backend.dto.DashboardSummaryDTO;
 import com.h12_25_l.equipo27.backend.dto.PredictionHistoryDTO;
 import com.h12_25_l.equipo27.backend.entity.Prediccion;
+import com.h12_25_l.equipo27.backend.enums.TipoPrevision;
 import com.h12_25_l.equipo27.backend.repository.PrediccionRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class DashboardService {
         long total = prediccionRepository.count();
         long retrasos = prediccionRepository.findAll()
                 .stream()
-                .filter(p -> "Retraso".equalsIgnoreCase(p.getPrevision()))
+                .filter(p -> p.getPrevision() == TipoPrevision.Retrasado)
                 .count();
         long puntuales = total - retrasos;
 

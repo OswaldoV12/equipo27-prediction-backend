@@ -1,5 +1,6 @@
 package com.h12_25_l.equipo27.backend.controller;
 
+import com.h12_25_l.equipo27.backend.dto.AerolineaDTO;
 import com.h12_25_l.equipo27.backend.entity.Aerolinea;
 import com.h12_25_l.equipo27.backend.service.AerolineaService;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class AerolineaController {
     }
 
     @GetMapping
-    public List<Aerolinea> listarAerolineas() {
+    public List<AerolineaDTO> listarAerolineas() {
         return aerolineaService.listarTodas();
     }
 }

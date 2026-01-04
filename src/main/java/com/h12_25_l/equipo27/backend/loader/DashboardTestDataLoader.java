@@ -4,6 +4,7 @@ import com.h12_25_l.equipo27.backend.entity.Aerolinea;
 import com.h12_25_l.equipo27.backend.entity.Aeropuerto;
 import com.h12_25_l.equipo27.backend.entity.Vuelo;
 import com.h12_25_l.equipo27.backend.entity.Prediccion;
+import com.h12_25_l.equipo27.backend.enums.TipoPrevision;
 import com.h12_25_l.equipo27.backend.repository.AerolineaRepository;
 import com.h12_25_l.equipo27.backend.repository.AeropuertoRepository;
 import com.h12_25_l.equipo27.backend.repository.VueloRepository;
@@ -61,7 +62,7 @@ public class DashboardTestDataLoader implements CommandLineRunner {
             vueloRepository.save(vuelo);
 
             // Creamos predicción aleatoria de "puntual" o "retraso"
-            String prevision = random.nextBoolean() ? "A tiempo" : "Retraso";
+            TipoPrevision prevision = random.nextBoolean() ? TipoPrevision.No_Retrasado : TipoPrevision.Retrasado;
             Double probabilidad = 0.5 + (0.5 * random.nextDouble()); // entre 0.5 y 1.0
 
             Prediccion prediccion = new Prediccion(vuelo, prevision, probabilidad);

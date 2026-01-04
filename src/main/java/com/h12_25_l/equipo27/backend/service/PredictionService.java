@@ -1,5 +1,6 @@
 package com.h12_25_l.equipo27.backend.service;
 
+import com.h12_25_l.equipo27.backend.client.DsApiClient;
 import com.h12_25_l.equipo27.backend.dto.PredictRequestDTO;
 import com.h12_25_l.equipo27.backend.dto.PredictResponseDTO;
 import com.h12_25_l.equipo27.backend.entity.Aerolinea;

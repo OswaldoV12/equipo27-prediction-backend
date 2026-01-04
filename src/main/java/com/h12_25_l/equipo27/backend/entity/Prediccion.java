@@ -1,5 +1,6 @@
 package com.h12_25_l.equipo27.backend.entity;
 
+import com.h12_25_l.equipo27.backend.enums.TipoPrevision;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -16,8 +17,9 @@ public class Prediccion {
     @JoinColumn(name = "vuelo_id")
     private Vuelo vuelo;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String prevision;
+    private TipoPrevision prevision;
 
     @Column(nullable = false)
     private Double probabilidad;
@@ -35,7 +37,7 @@ public class Prediccion {
     }
 
     //constructor
-    public Prediccion(Vuelo vuelo, String prevision, Double probabilidad) {
+    public Prediccion(Vuelo vuelo, TipoPrevision prevision, Double probabilidad) {
         this.vuelo = vuelo;
         this.prevision = prevision;
         this.probabilidad = probabilidad;
@@ -60,11 +62,11 @@ public class Prediccion {
         this.vuelo = vuelo;
     }
 
-    public String getPrevision() {
+    public TipoPrevision getPrevision() {
         return prevision;
     }
 
-    public void setPrevision(String prevision) {
+    public void setPrevision(TipoPrevision prevision) {
         this.prevision = prevision;
     }
 
