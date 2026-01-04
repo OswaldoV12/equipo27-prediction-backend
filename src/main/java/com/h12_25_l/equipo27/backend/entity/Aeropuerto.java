@@ -1,9 +1,15 @@
 package com.h12_25_l.equipo27.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "aeropuerto")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Aeropuerto {
 
     @Id
@@ -16,38 +22,9 @@ public class Aeropuerto {
     @Column(length = 3, nullable = false, unique = true)
     private String iata;
 
-    // Constructor vacío (necesario para JPA)
-    public Aeropuerto() {}
-
     //constructor
     public Aeropuerto(String nombre, String iata) {
         this.nombre = nombre;
-        this.iata = iata;
-    }
-
-    // getters / setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getIata() {
-        return iata;
-    }
-
-    public void setIata(String iata) {
         this.iata = iata;
     }
 }
