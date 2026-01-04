@@ -4,6 +4,7 @@ import com.h12_25_l.equipo27.backend.dto.DashboardSummaryDTO;
 import com.h12_25_l.equipo27.backend.dto.PredictionHistoryDTO;
 import com.h12_25_l.equipo27.backend.entity.Prediccion;
 import com.h12_25_l.equipo27.backend.entity.Vuelo;
+import com.h12_25_l.equipo27.backend.enums.TipoPrevision;
 import com.h12_25_l.equipo27.backend.repository.PrediccionRepository;
 import com.h12_25_l.equipo27.backend.service.DashboardService;
 import org.junit.jupiter.api.Test;
@@ -46,9 +47,9 @@ public class DashboardServiceTest {
     void shouldCalculateSummaryCorrectly(){
 
         List<Prediccion> predicciones = List.of(
-                mockPrediccion("Retraso"),
-                mockPrediccion("Puntual"),
-                mockPrediccion("Retraso")
+                mockPrediccion(TipoPrevision.Retrasado),
+                mockPrediccion(TipoPrevision.No_Retrasado),
+                mockPrediccion(TipoPrevision.Retrasado)
 
         );
 
@@ -117,7 +118,7 @@ public class DashboardServiceTest {
         assertEquals(2L, result.get(1).vueloId());
     }
 
-    private Prediccion mockPrediccion(String prevision) {
+    private Prediccion mockPrediccion(TipoPrevision prevision) {
         Prediccion p = new Prediccion();
         p.setPrevision(prevision);
         p.setCreatedAt(LocalDateTime.now());
@@ -126,7 +127,7 @@ public class DashboardServiceTest {
 
     private Prediccion mockPrediccionWithDate(LocalDateTime date) {
         Prediccion p = new Prediccion();
-        p.setPrevision("Retraso");
+        p.setPrevision(TipoPrevision.Retrasado);
         p.setCreatedAt(date);
         return p;
     }
@@ -138,7 +139,7 @@ public class DashboardServiceTest {
         Prediccion p = new Prediccion();
         p.setVuelo(vuelo);
         p.setCreatedAt(LocalDateTime.now());
-        p.setPrevision("Puntual");
+        p.setPrevision(TipoPrevision.No_Retrasado);
         p.setProbabilidad(0.2);
 
         return p;

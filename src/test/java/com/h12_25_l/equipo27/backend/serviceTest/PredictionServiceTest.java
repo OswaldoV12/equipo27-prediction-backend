@@ -6,13 +6,14 @@ import com.h12_25_l.equipo27.backend.entity.Aerolinea;
 import com.h12_25_l.equipo27.backend.entity.Aeropuerto;
 import com.h12_25_l.equipo27.backend.entity.Prediccion;
 import com.h12_25_l.equipo27.backend.entity.Vuelo;
+import com.h12_25_l.equipo27.backend.enums.TipoPrevision;
 import com.h12_25_l.equipo27.backend.exception.ExternalServiceException;
 import com.h12_25_l.equipo27.backend.exception.ValidationException;
 import com.h12_25_l.equipo27.backend.repository.AerolineaRepository;
 import com.h12_25_l.equipo27.backend.repository.AeropuertoRepository;
 import com.h12_25_l.equipo27.backend.repository.PrediccionRepository;
 import com.h12_25_l.equipo27.backend.repository.VueloRepository;
-import com.h12_25_l.equipo27.backend.service.DsApiClient;
+import com.h12_25_l.equipo27.backend.client.DsApiClient;
 import com.h12_25_l.equipo27.backend.service.PredictionService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -111,7 +112,7 @@ public class PredictionServiceTest {
         PredictResponseDTO result = predictionService.predictAndSave(request);
 
         assertNotNull(result);
-        assertEquals("Retrasado", result.prevision());
+        assertEquals(TipoPrevision.Retrasado, result.prevision());
 
         verify(vueloRepository).save(any(Vuelo.class));
         verify(prediccionRepository).save(any(Prediccion.class));
@@ -128,7 +129,7 @@ public class PredictionServiceTest {
     }
 
     private PredictResponseDTO validResponse() {
-        return new PredictResponseDTO("Retrasado", 0.78);
+        return new PredictResponseDTO(TipoPrevision.Retrasado, 0.78);
     }
 
     private Aerolinea mockAerolinea() {
