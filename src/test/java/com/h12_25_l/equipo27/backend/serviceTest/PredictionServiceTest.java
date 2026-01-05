@@ -1,7 +1,7 @@
 package com.h12_25_l.equipo27.backend.serviceTest;
 
-import com.h12_25_l.equipo27.backend.dto.PredictRequestDTO;
-import com.h12_25_l.equipo27.backend.dto.PredictResponseDTO;
+import com.h12_25_l.equipo27.backend.dto.core.PredictRequestDTO;
+import com.h12_25_l.equipo27.backend.dto.core.PredictResponseDTO;
 import com.h12_25_l.equipo27.backend.entity.Aerolinea;
 import com.h12_25_l.equipo27.backend.entity.Aeropuerto;
 import com.h12_25_l.equipo27.backend.entity.Prediccion;
@@ -14,7 +14,7 @@ import com.h12_25_l.equipo27.backend.repository.AeropuertoRepository;
 import com.h12_25_l.equipo27.backend.repository.PrediccionRepository;
 import com.h12_25_l.equipo27.backend.repository.VueloRepository;
 import com.h12_25_l.equipo27.backend.client.DsApiClient;
-import com.h12_25_l.equipo27.backend.service.PredictionService;
+import com.h12_25_l.equipo27.backend.service.core.PredictionService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

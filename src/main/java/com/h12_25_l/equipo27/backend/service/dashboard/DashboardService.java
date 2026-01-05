@@ -1,7 +1,7 @@
-package com.h12_25_l.equipo27.backend.service;
+package com.h12_25_l.equipo27.backend.service.dashboard;
 
-import com.h12_25_l.equipo27.backend.dto.DashboardSummaryDTO;
-import com.h12_25_l.equipo27.backend.dto.PredictionHistoryDTO;
+import com.h12_25_l.equipo27.backend.dto.dashboard.DashboardSummaryDTO;
+import com.h12_25_l.equipo27.backend.dto.dashboard.PredictionHistoryDTO;
 import com.h12_25_l.equipo27.backend.entity.Prediccion;
 import com.h12_25_l.equipo27.backend.enums.TipoPrevision;
 import com.h12_25_l.equipo27.backend.repository.PrediccionRepository;

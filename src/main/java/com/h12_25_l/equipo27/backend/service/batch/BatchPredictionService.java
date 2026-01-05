@@ -1,9 +1,11 @@
-package com.h12_25_l.equipo27.backend.service;
+package com.h12_25_l.equipo27.backend.service.batch;
 
-import com.h12_25_l.equipo27.backend.dto.PredictRequestDTO;
-import com.h12_25_l.equipo27.backend.dto.PredictResponseDTO;
-import com.h12_25_l.equipo27.backend.dto.*;
-import com.h12_25_l.equipo27.backend.service.PredictionService;
+import com.h12_25_l.equipo27.backend.dto.batch.BatchItemResultDTO;
+import com.h12_25_l.equipo27.backend.dto.batch.BatchPredictResponseDTO;
+import com.h12_25_l.equipo27.backend.dto.batch.CsvPredictRowDTO;
+import com.h12_25_l.equipo27.backend.dto.core.PredictRequestDTO;
+import com.h12_25_l.equipo27.backend.dto.core.PredictResponseDTO;
+import com.h12_25_l.equipo27.backend.service.core.PredictionService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.springframework.stereotype.Service;

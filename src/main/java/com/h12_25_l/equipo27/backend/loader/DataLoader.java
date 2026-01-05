@@ -1,4 +1,4 @@
-package com.h12_25_l.equipo27.backend.loader;
+/*package com.h12_25_l.equipo27.backend.loader;
 
 import com.h12_25_l.equipo27.backend.entity.Aerolinea;
 import com.h12_25_l.equipo27.backend.entity.Aeropuerto;
@@ -77,3 +77,4 @@ public class DataLoader implements CommandLineRunner {
 
     }
 }
+*/

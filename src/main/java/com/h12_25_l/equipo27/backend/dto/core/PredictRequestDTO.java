@@ -1,4 +1,4 @@
-package com.h12_25_l.equipo27.backend.dto;
+package com.h12_25_l.equipo27.backend.dto.core;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;

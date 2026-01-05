@@ -1,0 +1,7 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  # Aquí se pondra la configuración de la DB de produccion
+

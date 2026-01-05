@@ -1,8 +1,8 @@
-package com.h12_25_l.equipo27.backend.service;
+package com.h12_25_l.equipo27.backend.service.core;
 
 import com.h12_25_l.equipo27.backend.client.DsApiClient;
-import com.h12_25_l.equipo27.backend.dto.PredictRequestDTO;
-import com.h12_25_l.equipo27.backend.dto.PredictResponseDTO;
+import com.h12_25_l.equipo27.backend.dto.core.PredictRequestDTO;
+import com.h12_25_l.equipo27.backend.dto.core.PredictResponseDTO;
 import com.h12_25_l.equipo27.backend.entity.Aerolinea;
 import com.h12_25_l.equipo27.backend.entity.Aeropuerto;
 import com.h12_25_l.equipo27.backend.entity.Prediccion;

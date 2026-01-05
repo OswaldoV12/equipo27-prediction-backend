@@ -1,7 +1,7 @@
 package com.h12_25_l.equipo27.backend.client;
 
-import com.h12_25_l.equipo27.backend.dto.DsPredictResponseDTO;
-import com.h12_25_l.equipo27.backend.dto.PredictResponseDTO;
+import com.h12_25_l.equipo27.backend.dto.dashboard.DsPredictResponseDTO;
+import com.h12_25_l.equipo27.backend.dto.core.PredictResponseDTO;
 import com.h12_25_l.equipo27.backend.enums.TipoPrevision;
 import com.h12_25_l.equipo27.backend.exception.ExternalServiceException;
 import org.slf4j.Logger;

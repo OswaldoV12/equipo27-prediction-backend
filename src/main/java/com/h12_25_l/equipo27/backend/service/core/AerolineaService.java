@@ -1,7 +1,6 @@
-package com.h12_25_l.equipo27.backend.service;
+package com.h12_25_l.equipo27.backend.service.core;
 
-import com.h12_25_l.equipo27.backend.dto.AerolineaDTO;
-import com.h12_25_l.equipo27.backend.entity.Aerolinea;
+import com.h12_25_l.equipo27.backend.dto.core.AerolineaDTO;
 import com.h12_25_l.equipo27.backend.repository.AerolineaRepository;
 import org.springframework.stereotype.Service;
 

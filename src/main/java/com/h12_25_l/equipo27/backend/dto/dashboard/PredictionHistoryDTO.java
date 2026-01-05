@@ -1,4 +1,4 @@
-package com.h12_25_l.equipo27.backend.dto;
+package com.h12_25_l.equipo27.backend.dto.dashboard;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.h12_25_l.equipo27.backend.enums.TipoPrevision;

@@ -1,6 +1,6 @@
-package com.h12_25_l.equipo27.backend.service;
+package com.h12_25_l.equipo27.backend.service.batch;
 
-import com.h12_25_l.equipo27.backend.dto.CsvPredictRowDTO;
+import com.h12_25_l.equipo27.backend.dto.batch.CsvPredictRowDTO;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
