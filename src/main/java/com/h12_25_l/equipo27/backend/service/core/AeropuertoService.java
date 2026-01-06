@@ -20,7 +20,11 @@ public class AeropuertoService {
                 .stream()
                 .map(a -> new AeropuertoDTO(
                         a.getIata(),
-                        a.getNombre()
-                )).toList();
+                        a.getNombre(),
+                        a.getLatitud(),
+                        a.getLongitud()
+                ))
+                .toList();
     }
+
 }

@@ -34,7 +34,7 @@ public class DsApiClient {
                 throw new ExternalServiceException("Respuesta nula desde DS");
             }
 
-            // 🔑 Mapeo DS → Dominio
+            // Mapeo DS → Dominio
             return new PredictResponseDTO(
                     mapPrevisionFromDs(dsResponse.prevision()),
                     dsResponse.probabilidad()

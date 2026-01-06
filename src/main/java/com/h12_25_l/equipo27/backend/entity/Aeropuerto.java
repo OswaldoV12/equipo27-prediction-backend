@@ -22,9 +22,24 @@ public class Aeropuerto {
     @Column(length = 3, nullable = false, unique = true)
     private String iata;
 
-    //constructor
+    @Column(nullable = false)
+    private Double latitud;   // nueva columna para latitud
+
+    @Column(nullable = false)
+    private Double longitud;  // nueva columna para longitud
+
+    // Constructor antiguo (para compatibilidad)
     public Aeropuerto(String nombre, String iata) {
         this.nombre = nombre;
         this.iata = iata;
     }
+
+    // Nuevo constructor con latitud y longitud
+    public Aeropuerto(String nombre, String iata, Double latitud, Double longitud) {
+        this.nombre = nombre;
+        this.iata = iata;
+        this.latitud = latitud;
+        this.longitud = longitud;
+    }
 }
+
