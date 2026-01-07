@@ -1,4 +1,4 @@
-package com.h12_25_l.equipo27.backend.dto.dashboard;
+package com.h12_25_l.equipo27.backend.dto.core;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -17,5 +17,17 @@ public record DsPredictResponseDTO(
                 description = "Probabilidad asociada a la predicción (valor entre 0 y 1)",
                 example = "0.82"
         )
-        Double probabilidad
+        Double probabilidad,
+
+        @Schema(
+                description = "Tiempo de respuesta del modelo DS",
+                example = "2.12"
+        )
+                Double latencia,
+
+        @Schema(
+                description = "Descipcion del motivo asociado al retrazo de un vuelo",
+                example = "La aerolinea AZ tiene retrazos concurrentes a la hora 14:30:00"
+        )
+        String explicabilidad
 ) {}

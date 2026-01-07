@@ -18,4 +18,5 @@ public record PredictResponseDTO(
                 example = "0.78"
         )
         Double probabilidad
+
 ) {}

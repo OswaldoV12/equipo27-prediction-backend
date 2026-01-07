@@ -3,16 +3,11 @@ package com.h12_25_l.equipo27.backend.service.core;
 import com.h12_25_l.equipo27.backend.client.DsApiClient;
 import com.h12_25_l.equipo27.backend.dto.core.*;
 import com.h12_25_l.equipo27.backend.dto.externalapi.WeatherDataDTO;
-import com.h12_25_l.equipo27.backend.entity.Aerolinea;
-import com.h12_25_l.equipo27.backend.entity.Aeropuerto;
-import com.h12_25_l.equipo27.backend.entity.Prediccion;
-import com.h12_25_l.equipo27.backend.entity.Vuelo;
+import com.h12_25_l.equipo27.backend.entity.*;
+import com.h12_25_l.equipo27.backend.enums.TipoPrevision;
 import com.h12_25_l.equipo27.backend.exception.ExternalServiceException;
 import com.h12_25_l.equipo27.backend.exception.ValidationException;
-import com.h12_25_l.equipo27.backend.repository.AerolineaRepository;
-import com.h12_25_l.equipo27.backend.repository.AeropuertoRepository;
-import com.h12_25_l.equipo27.backend.repository.PrediccionRepository;
-import com.h12_25_l.equipo27.backend.repository.VueloRepository;
+import com.h12_25_l.equipo27.backend.repository.*;
 import com.h12_25_l.equipo27.backend.service.externalapi.WeatherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +43,13 @@ public class PredictionService {
     @Transactional
     public PredictResponseDTO predictAndSave(PredictRequestDTO request) {
 
-        // Validación básica
+        // --- Validaciones básicas ---
         if (request.origen().equals(request.destino())) {
             LOG.warn("Origen y destino iguales: {}", request.origen());
             throw new ValidationException("Origen y destino no pueden ser iguales");
         }
 
-        // Buscar entidades maestras en BD
+        // --- Buscar entidades maestras en BD ---
         Aerolinea aerolinea = aerolineaRepository.findAll()
                 .stream()
                 .filter(a -> a.getIata().equals(request.aerolinea()))
@@ -73,7 +68,7 @@ public class PredictionService {
                 .findFirst()
                 .orElseThrow(() -> new ValidationException("Aeropuerto destino no encontrado: " + request.destino()));
 
-        // Obtener datos de clima del aeropuerto de origen con manejo de fallo
+        // --- Obtener clima ---
         WeatherDataDTO clima;
         try {
             clima = weatherService.obtenerClima(
@@ -85,17 +80,10 @@ public class PredictionService {
                     clima.temperature2m(), clima.windSpeed10m(), clima.visibility());
         } catch (Exception e) {
             LOG.warn("API de clima caída, usando valores por defecto: {}", e.getMessage());
-            clima = new WeatherDataDTO(
-                    20.0,  // temperatura por defecto en °C
-                    5.0,   // velocidad del viento por defecto en km/h
-                    10.0   // visibilidad por defecto en km
-            );
-            LOG.info("Valores de clima por defecto: Temp={}°C, Viento={} km/h, Visibilidad={} km",
-                    clima.temperature2m(), clima.windSpeed10m(), clima.visibility());
+            clima = new WeatherDataDTO(20.0, 5.0, 10.0);
         }
 
-
-        // Crear DTO combinado para enviar a DS
+        // --- Preparar request para DS ---
         DsPredictRequestDTO dsRequest = new DsPredictRequestDTO(
                 request.aerolinea(),
                 request.origen(),
@@ -107,28 +95,39 @@ public class PredictionService {
                 clima.visibility()
         );
 
-        // Llamada al modelo DS
-        PredictResponseDTO response = dsApiClient.predict(dsRequest);
-        if (response == null) {
+        // --- Llamada al modelo DS ---
+        DsPredictResponseDTO dsResponse = dsApiClient.predictRaw(dsRequest);
+        if (dsResponse == null) {
             LOG.warn("Respuesta nula del modelo DS");
             throw new ExternalServiceException("Respuesta inválida del modelo DS");
         }
 
-        // Crear y guardar Vuelo
+        TipoPrevision tipo = DsApiClient.mapPrevisionFromDs(dsResponse.prevision());
+
+        // --- Guardar Vuelo ---
         Vuelo vuelo = new Vuelo(aerolinea, origen, destino, request.fecha_partida(), request.distancia_km());
         vueloRepository.save(vuelo);
 
-        // Crear y guardar Predicción
-        Prediccion prediccion = new Prediccion(vuelo, response.prevision(), response.probabilidad());
+        // --- Guardar Predicción completa ---
+        Prediccion prediccion = new Prediccion(
+                vuelo,
+                tipo,
+                dsResponse.probabilidad(),
+                dsResponse.latencia(),
+                dsResponse.explicabilidad()
+        );
         prediccionRepository.save(prediccion);
 
         LOG.info("Predicción realizada y guardada correctamente para vuelo {}-{}",
                 request.origen(), request.destino());
 
-        return response;
+        // --- Retornar solo lo visible al frontend ---
+        return new PredictResponseDTO(
+                tipo,
+                dsResponse.probabilidad()
+        );
     }
 }
-
 
 
 
