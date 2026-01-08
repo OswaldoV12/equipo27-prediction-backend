@@ -56,7 +56,7 @@ public class Prediccion {
         this.explicabilidad = explicabilidad;
     }
 
-    // Constructor antiguo para compatibilidad si lo usás
+    // Constructor antiguo para compatibilidad
     public Prediccion(Vuelo vuelo, TipoPrevision prevision, Double probabilidad) {
         this(vuelo, prevision, probabilidad, null, null);
     }

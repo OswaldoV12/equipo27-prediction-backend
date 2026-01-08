@@ -14,8 +14,8 @@ public record PredictResponseDTO(
         TipoPrevision prevision,
 
         @Schema(
-                description = "Probabilidad asociada a la predicción (valor entre 0 y 1)",
-                example = "0.78"
+                description = "Probabilidad asociada a la predicción en porcentaje",
+                example = "74"
         )
         Double probabilidad
 

@@ -124,7 +124,7 @@ public class PredictionService {
         // --- Retornar solo lo visible al frontend ---
         return new PredictResponseDTO(
                 tipo,
-                dsResponse.probabilidad()
+                (dsResponse.probabilidad()*100)
         );
     }
 }

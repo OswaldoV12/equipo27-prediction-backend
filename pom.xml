@@ -63,6 +63,13 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- postgresql-->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.7.7</version>
+		</dependency>
+
 		<!-- Validaciones -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
