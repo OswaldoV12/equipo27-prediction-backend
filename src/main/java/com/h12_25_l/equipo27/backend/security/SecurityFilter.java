@@ -1,7 +1,6 @@
-package com.h12_25_l.equipo27.backend.config.security;
+package com.h12_25_l.equipo27.backend.security;
 
 import com.h12_25_l.equipo27.backend.repository.UserRepository;
-import com.h12_25_l.equipo27.backend.service.security.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

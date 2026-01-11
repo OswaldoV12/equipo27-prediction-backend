@@ -1,9 +1,9 @@
 package com.h12_25_l.equipo27.backend.controller;
 
-import com.h12_25_l.equipo27.backend.dto.security.UserDTO;
+import com.h12_25_l.equipo27.backend.dto.user.UserDTO;
 import com.h12_25_l.equipo27.backend.entity.User;
-import com.h12_25_l.equipo27.backend.dto.security.TokenJWT;
-import com.h12_25_l.equipo27.backend.service.security.TokenService;
+import com.h12_25_l.equipo27.backend.security.TokenJWT;
+import com.h12_25_l.equipo27.backend.security.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

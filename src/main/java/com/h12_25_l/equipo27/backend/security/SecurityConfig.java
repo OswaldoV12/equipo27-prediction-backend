@@ -1,4 +1,4 @@
-package com.h12_25_l.equipo27.backend.config.security;
+package com.h12_25_l.equipo27.backend.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

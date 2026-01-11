@@ -1,4 +1,4 @@
-package com.h12_25_l.equipo27.backend.service.security;
+package com.h12_25_l.equipo27.backend.security;
 
 import com.h12_25_l.equipo27.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

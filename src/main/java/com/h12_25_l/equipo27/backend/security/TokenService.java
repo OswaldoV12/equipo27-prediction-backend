@@ -1,4 +1,4 @@
-package com.h12_25_l.equipo27.backend.service.security;
+package com.h12_25_l.equipo27.backend.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
