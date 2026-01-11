@@ -1,10 +1,8 @@
 package com.h12_25_l.equipo27.backend.dto.user;
 
-public record UserDTO(
-        Long id,
+public record RegisterRequest(
         String username,
         String email,
-        String password,
-        String rol
-) {
+        String password
+){
 }

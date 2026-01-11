@@ -1,5 +1,6 @@
 package com.h12_25_l.equipo27.backend.entity;
 
+import com.h12_25_l.equipo27.backend.enums.Roles;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,52 +11,20 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class User implements UserDetails {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String username;
     private String email;
     private String password;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities(){
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-    }
-
-    @Override
-    public String getPassword(){
-        return password;
-    }
-
-    @Override
-    public String getUsername(){
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    @Enumerated
+    private Roles rol;
 }
