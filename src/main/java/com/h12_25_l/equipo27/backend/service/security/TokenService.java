@@ -5,7 +5,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.h12_25_l.equipo27.backend.entity.User;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -13,12 +12,11 @@ import java.util.Date;
 @Service
 public class TokenService {
 
-    @Value("${security.jwt.secret}")
-    private String secret;
+    private static final String SECRET_KEY = "123456";
 
     public String generarToken(User user) {
         try {
-            var algorithm = Algorithm.HMAC256(secret);
+            var algorithm = Algorithm.HMAC256(SECRET_KEY);
             return JWT.create()
                     .withSubject(user.getEmail())
                     .withIssuedAt(new Date())
@@ -31,7 +29,7 @@ public class TokenService {
 
     public String getSubject(String tokenJWT){
         try {
-            var algorithm = Algorithm.HMAC256(secret);
+            var algorithm = Algorithm.HMAC256(SECRET_KEY);
             return JWT.require(algorithm)
                     .build()
                     .verify(tokenJWT)
