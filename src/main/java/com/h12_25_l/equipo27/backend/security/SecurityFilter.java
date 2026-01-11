@@ -31,49 +31,45 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException{
-        System.out.println("Filtro llamado!!!");
+
         // Obtenemos del Header
-        var tokenJWT = getToken(request);
-        System.out.println("Este es el token limpio!!! " + tokenJWT);
-        if (tokenJWT != null){
+        String authHeader = request.getHeader("Authorization");
+        System.out.println("JWT: "+ authHeader);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            // Obtenemos el email
-            String email = tokenService.getUsernameFromToken(tokenJWT);
+        String jwt = authHeader.substring(7); //  AQUÍ SÍ se limpia
+        System.out.println("JWT limpio: " + jwt);
+        // Obtenemos el email
+        String email = tokenService.getUsernameFromToken(jwt);
 
-            // Si existe email y no hat sesión activa entra
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null){
-                // Se busca usuario en la base de datos
-                User user = repository.findByEmail(email).orElse(null);
+        // Si existe email y no hat sesión activa entra
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                // Si el usuario existe entra y revisa que sea valido
-                if (user != null && tokenService.isTokenValid(tokenJWT, email)){
-                    // Crear objeto de autenticación
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    user,
-                                    null,
-                                    List.of(new SimpleGrantedAuthority("ROLE_" + user.getRol()))
-                            );
+            // Se busca usuario en la base de datos
+            User user = repository.findByEmail(email).orElse(null);
 
-                    authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
-                    // Para esta requeste el usuario esta autenticado
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
+            // Si el usuario existe entra y revisa que sea valido
+            if (user != null && tokenService.isTokenValid(jwt, email)) {
+
+                // Crear objeto de autenticación
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                user,
+                                null,
+                                List.of(new SimpleGrantedAuthority("ROLE_"+user.getRol()))
+                        );
+
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+                // Para esta requeste el usuario esta autenticado
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        filterChain.doFilter(request,response);
-    }
 
-    //Obtener Token
-    private String getToken(HttpServletRequest request) {
-        var authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader != null){
-            System.out.println("Funciona!!! " + authorizationHeader);
-            return authorizationHeader.replace("Bearer ", "");
-        }
-        return null;
+        filterChain.doFilter(request, response);
     }
-
 }
