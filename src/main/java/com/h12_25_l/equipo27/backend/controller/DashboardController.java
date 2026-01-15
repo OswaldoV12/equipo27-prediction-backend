@@ -1,8 +1,8 @@
 package com.h12_25_l.equipo27.backend.controller;
 
-import com.h12_25_l.equipo27.backend.dto.DashboardSummaryDTO;
-import com.h12_25_l.equipo27.backend.dto.PredictionHistoryDTO;
-import com.h12_25_l.equipo27.backend.service.DashboardService;
+import com.h12_25_l.equipo27.backend.dto.dashboard.DashboardSummaryDTO;
+import com.h12_25_l.equipo27.backend.dto.dashboard.PredictionHistoryDTO;
+import com.h12_25_l.equipo27.backend.service.dashboard.DashboardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

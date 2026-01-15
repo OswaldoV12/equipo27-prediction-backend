@@ -1,9 +1,8 @@
 package com.h12_25_l.equipo27.backend.controller;
 
-import com.h12_25_l.equipo27.backend.dto.PredictRequestDTO;
-import com.h12_25_l.equipo27.backend.service.PredictionService;
+import com.h12_25_l.equipo27.backend.dto.core.PredictRequestDTO;
+import com.h12_25_l.equipo27.backend.service.core.PredictionService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

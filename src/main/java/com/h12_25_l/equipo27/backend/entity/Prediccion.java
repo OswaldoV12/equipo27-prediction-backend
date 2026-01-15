@@ -32,6 +32,12 @@ public class Prediccion {
     @Column(nullable = false)
     private Double probabilidad;
 
+    @Column
+    private Double latencia;  // nuevo
+
+    @Column
+    private String explicabilidad; // nuevo
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -40,12 +46,18 @@ public class Prediccion {
         this.createdAt = LocalDateTime.now();
     }
 
-    //constructor
-    public Prediccion(Vuelo vuelo, TipoPrevision prevision, Double probabilidad) {
+    // Constructor para guardar todo desde DS
+    public Prediccion(Vuelo vuelo, TipoPrevision prevision, Double probabilidad,
+                      Double latencia, String explicabilidad) {
         this.vuelo = vuelo;
         this.prevision = prevision;
         this.probabilidad = probabilidad;
-        // createdAt se asigna automáticamente por @PrePersist
+        this.latencia = latencia;
+        this.explicabilidad = explicabilidad;
     }
 
+    // Constructor antiguo para compatibilidad
+    public Prediccion(Vuelo vuelo, TipoPrevision prevision, Double probabilidad) {
+        this(vuelo, prevision, probabilidad, null, null);
+    }
 }

@@ -1,8 +1,8 @@
 package com.h12_25_l.equipo27.backend.controller;
 
-import com.h12_25_l.equipo27.backend.dto.BatchPredictResponseDTO;
-import com.h12_25_l.equipo27.backend.service.BatchPredictionService;
-import com.h12_25_l.equipo27.backend.service.CsvParserService;
+import com.h12_25_l.equipo27.backend.dto.batch.BatchPredictResponseDTO;
+import com.h12_25_l.equipo27.backend.service.batch.BatchPredictionService;
+import com.h12_25_l.equipo27.backend.service.batch.CsvParserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
