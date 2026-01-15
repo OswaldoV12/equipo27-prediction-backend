@@ -2,6 +2,7 @@ package com.h12_25_l.equipo27.backend.controller;
 
 import com.h12_25_l.equipo27.backend.dto.core.AerolineaDTO;
 import com.h12_25_l.equipo27.backend.service.core.AerolineaService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +18,8 @@ public class AerolineaController {
     }
 
     @GetMapping
-    public List<AerolineaDTO> listarAerolineas() {
-        return aerolineaService.listarTodas();
+    public ResponseEntity<List<AerolineaDTO>> listarAerolineas() {
+        List<AerolineaDTO> aerolineas = aerolineaService.listarTodas();
+        return ResponseEntity.ok(aerolineas);
     }
 }

@@ -6,6 +6,7 @@ import com.h12_25_l.equipo27.backend.dto.usuario.RegisterRequestDTO;
 import com.h12_25_l.equipo27.backend.entity.Usuario;
 import com.h12_25_l.equipo27.backend.service.usuario.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +26,7 @@ public class AuthController {
                 request.email(),
                 request.password()
         );
-        return ResponseEntity.ok("Usuario registrado");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado correctamente");
     }
 
     @PostMapping("/login")

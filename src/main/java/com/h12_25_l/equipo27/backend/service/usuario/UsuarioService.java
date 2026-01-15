@@ -1,6 +1,7 @@
 package com.h12_25_l.equipo27.backend.service.usuario;
 
 import com.h12_25_l.equipo27.backend.entity.Usuario;
+import com.h12_25_l.equipo27.backend.exception.UnauthorizedException;
 import com.h12_25_l.equipo27.backend.repository.UsuarioRepository;
 import com.h12_25_l.equipo27.backend.service.seguridad.JwtService;
 import com.h12_25_l.equipo27.backend.enums.Roles;
@@ -39,14 +40,14 @@ public class UsuarioService {
 
     public String login(String email, String password) {
         Optional<Usuario> userOptional = userRepository.findByEmail(email);
-        Usuario user = userOptional.get();
 
         if (userOptional.isEmpty()) {
-            throw new RuntimeException("Usuario no encontrado");
+            throw new UnauthorizedException("Usuario no encontrado");
         }
 
+        Usuario user = userOptional.get();
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Contraseña incorrecta");
+            throw new UnauthorizedException("Contraseña incorrecta");
         }
 
         // Generar token con Auth0
