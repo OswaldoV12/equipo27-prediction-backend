@@ -31,10 +31,29 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        //  IGNORAR rutas públicas
+        if ( path.startsWith("/auth/login") ||
+                path.startsWith("/auth/register") ||
+                path.startsWith("/api/aerolineas") ||
+                path.startsWith("/api/aeropuertos") ||
+                path.startsWith("/api/distancia") ||
+                path.startsWith("/api/predict") ||
+                path.startsWith("/api/metrics")
+        ) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Obtenemos del Header
         String authHeader = request.getHeader("Authorization");
         System.out.println("JWT: "+ authHeader);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if ( authHeader == null ||
+                !authHeader.startsWith("Bearer ") ||
+                authHeader.equals("Bearer null") ||
+                authHeader.equals("Bearer undefined")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -46,25 +65,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // Si existe email y no hat sesión activa entra
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            // Se busca usuario en la base de datos
             Usuario user = usuarioRepository.findByEmail(email).orElse(null);
-
-            // Si el usuario existe entra y revisa que sea valido
             if (user != null && jwtService.isTokenValid(jwt, email)) {
-
-                // Crear objeto de autenticación
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 user,
                                 null,
                                 List.of(new SimpleGrantedAuthority("ROLE_"+user.getRol()))
                         );
-
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
-                // Para esta requeste el usuario esta autenticado
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }

@@ -21,7 +21,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())   // Desactivar CSRF para permitir POST desde Postman
                 .cors(Customizer.withDefaults())  // Habilitar CORS (aunque desde Postman no es necesario)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()  // Rutas públicas
+                        .requestMatchers(
+                                "/auth/login",
+                                "/auth/register",
+                                "/api/aerolineas/**",
+                                "/api/aeropuertos/**",
+                                "/api/distancia/**",
+                                "/api/predict/**",
+                                "/api/metrics/**"
+                        ).permitAll()  // Rutas públicas
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()             // Todo lo demás protegido
                 )
