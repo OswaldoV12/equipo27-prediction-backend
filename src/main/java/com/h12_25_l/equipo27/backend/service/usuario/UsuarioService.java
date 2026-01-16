@@ -1,5 +1,6 @@
 package com.h12_25_l.equipo27.backend.service.usuario;
 
+import com.h12_25_l.equipo27.backend.dto.usuario.UserProfileDTO;
 import com.h12_25_l.equipo27.backend.entity.Usuario;
 import com.h12_25_l.equipo27.backend.repository.UsuarioRepository;
 import com.h12_25_l.equipo27.backend.service.seguridad.JwtService;
@@ -51,5 +52,13 @@ public class UsuarioService {
 
         // Generar token con Auth0
         return jwtService.generateToken(user.getEmail());
+    }
+
+    public UserProfileDTO getProfile(String email){
+        Usuario user = getEmail(email);
+        if (user == null){
+            return null;
+        }
+        return new UserProfileDTO(user.getUsername(), user.getEmail(), user.getRol());
     }
 }
