@@ -22,14 +22,14 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())  // Habilitar CORS (aunque desde Postman no es necesario)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**",
-                                "/api/aerolineas",
-                                "/api/aeropuertos",
-                                "/api/distancia",
-                                "/api/predict",
-                                "/api/predict/batch",
-                                "/api/metrics"
-                                ).permitAll()  // Rutas públicas
+                                "/auth/login",
+                                "/auth/register",
+                                "/api/aerolineas/**",
+                                "/api/aeropuertos/**",
+                                "/api/distancia/**",
+                                "/api/predict/**",
+                                "/api/metrics/**"
+                        ).permitAll()  // Rutas públicas
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()             // Todo lo demás protegido
                 )

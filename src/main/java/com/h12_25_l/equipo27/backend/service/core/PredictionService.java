@@ -4,10 +4,12 @@ import com.h12_25_l.equipo27.backend.client.DsApiClient;
 import com.h12_25_l.equipo27.backend.dto.core.*;
 import com.h12_25_l.equipo27.backend.dto.externalapi.WeatherDataDTO;
 import com.h12_25_l.equipo27.backend.entity.*;
+import com.h12_25_l.equipo27.backend.enums.Roles;
 import com.h12_25_l.equipo27.backend.enums.TipoPrevision;
 import com.h12_25_l.equipo27.backend.exception.ExternalServiceException;
 import com.h12_25_l.equipo27.backend.exception.ValidationException;
 import com.h12_25_l.equipo27.backend.repository.*;
+import com.h12_25_l.equipo27.backend.seguridad.SecurityUtils;
 import com.h12_25_l.equipo27.backend.service.externalapi.WeatherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,19 +27,22 @@ public class PredictionService {
     private final AeropuertoRepository aeropuertoRepository;
     private final VueloRepository vueloRepository;
     private final PrediccionRepository prediccionRepository;
+    private final UsuarioRepository usuarioRepository;
+
 
     public PredictionService(DsApiClient dsApiClient,
                              WeatherService weatherService,
                              AerolineaRepository aerolineaRepository,
                              AeropuertoRepository aeropuertoRepository,
                              VueloRepository vueloRepository,
-                             PrediccionRepository prediccionRepository) {
+                             PrediccionRepository prediccionRepository, UsuarioRepository usuarioRepository) {
         this.dsApiClient = dsApiClient;
         this.weatherService = weatherService;
         this.aerolineaRepository = aerolineaRepository;
         this.aeropuertoRepository = aeropuertoRepository;
         this.vueloRepository = vueloRepository;
         this.prediccionRepository = prediccionRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Transactional
@@ -101,12 +106,30 @@ public class PredictionService {
             LOG.warn("Respuesta nula del modelo DS");
             throw new ExternalServiceException("Respuesta inválida del modelo DS");
         }
-
         TipoPrevision tipo = DsApiClient.mapPrevisionFromDs(dsResponse.prevision());
 
+        Usuario usuario;
+        if (SecurityUtils.isAuthenticated()) {
+            usuario = usuarioRepository.findById(
+                    SecurityUtils.getUsuarioActual().getId()
+            ).orElseThrow(() -> new ValidationException("Usuario autenticado no encontrado"));
+        } else {
+            usuario = usuarioRepository.findByRol(Roles.INVITADO)
+                    .orElseThrow(() -> new ValidationException("Usuario INVITADO no configurado"));
+        }
+
+
         // --- Guardar Vuelo ---
-        Vuelo vuelo = new Vuelo(aerolinea, origen, destino, request.fecha_partida(), request.distancia_km());
+        Vuelo vuelo = new Vuelo(
+                usuario,
+                aerolinea,
+                origen,
+                destino,
+                request.fecha_partida(),
+                request.distancia_km()
+        );
         vueloRepository.save(vuelo);
+
 
         // --- Guardar Predicción completa ---
         Prediccion prediccion = new Prediccion(
