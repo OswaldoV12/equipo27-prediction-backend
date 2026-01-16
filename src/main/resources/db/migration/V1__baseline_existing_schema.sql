@@ -1,0 +1,2 @@
+-- Baseline de esquema existente
+-- NO contiene SQL porque la BD ya está creada

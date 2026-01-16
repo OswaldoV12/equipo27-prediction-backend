@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class PredictionService {
 
@@ -95,12 +97,24 @@ public class PredictionService {
                 clima.visibility()
         );
 
-        // --- Llamada al modelo DS ---
-        DsPredictResponseDTO dsResponse = dsApiClient.predictRaw(dsRequest);
-        if (dsResponse == null) {
-            LOG.warn("Respuesta nula del modelo DS");
+        // --- Construir array con un solo elemento ---
+        List<DsPredictRequestDTO> dsRequestList = List.of(dsRequest);
+
+        // --- Llamada al modelo DS y recibir array ---
+        DsPredictResponseDTO[] dsResponseArray;
+        try {
+            dsResponseArray = dsApiClient.predictRawArray(dsRequestList);
+        } catch (Exception e) {
+            LOG.error("Error comunicándose con DS", e);
+            throw new ExternalServiceException("Error de comunicación con DS", e);
+        }
+
+        // --- Tomar el primer elemento del array como respuesta ---
+        if (dsResponseArray == null || dsResponseArray.length == 0 || dsResponseArray[0] == null) {
+            LOG.warn("Respuesta nula o vacía del modelo DS");
             throw new ExternalServiceException("Respuesta inválida del modelo DS");
         }
+        DsPredictResponseDTO dsResponse = dsResponseArray[0];
 
         TipoPrevision tipo = DsApiClient.mapPrevisionFromDs(dsResponse.prevision());
 
@@ -124,10 +138,11 @@ public class PredictionService {
         // --- Retornar solo lo visible al frontend ---
         return new PredictResponseDTO(
                 tipo,
-                (dsResponse.probabilidad()*100)
+                dsResponse.probabilidad() * 100
         );
     }
 }
+
 
 
 

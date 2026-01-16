@@ -70,6 +70,12 @@
 			<version>42.7.7</version>
 		</dependency>
 
+		<!-- Flyway-->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+
 		<!-- Validaciones -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
