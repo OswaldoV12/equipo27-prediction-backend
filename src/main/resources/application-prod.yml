@@ -4,10 +4,13 @@ spring:
       on-profile: prod
 
   datasource:
-    url: jdbc:${DATABASE_URL}
+    url: jdbc:postgresql://${DATABASE_URL#postgresql://}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: false
+
+server:
+  port: ${PORT:8080}
