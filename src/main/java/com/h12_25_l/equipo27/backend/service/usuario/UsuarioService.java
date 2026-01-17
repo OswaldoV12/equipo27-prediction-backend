@@ -52,7 +52,7 @@ public class UsuarioService {
         }
 
         // Generar token con Auth0
-        return jwtService.generateToken(user.getEmail());
+        return jwtService.generateToken(user);
     }
 
     public UserProfileDTO getProfile(String email){
