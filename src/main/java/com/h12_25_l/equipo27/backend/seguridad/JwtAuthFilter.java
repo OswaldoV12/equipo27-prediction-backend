@@ -33,18 +33,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        //  IGNORAR rutas públicas
+        // Rutas totalmente públicas donde NO queremos ni leer token
         if ( path.startsWith("/auth/login") ||
                 path.startsWith("/auth/register") ||
                 path.startsWith("/api/aerolineas") ||
                 path.startsWith("/api/aeropuertos") ||
                 path.startsWith("/api/distancia") ||
-                path.startsWith("/api/predict") ||
                 path.startsWith("/api/metrics")
         ) {
             filterChain.doFilter(request, response);
             return;
         }
+
 
         // Obtenemos del Header
         String authHeader = request.getHeader("Authorization");
