@@ -33,10 +33,10 @@ public class Prediccion {
     private Double probabilidad;
 
     @Column
-    private Double latencia;  // nuevo
+    private Double latencia;
 
-    @Column
-    private String explicabilidad; // nuevo
+    @Column(columnDefinition = "TEXT")
+    private String explicabilidad; // guardamos como JSON string
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -46,7 +46,6 @@ public class Prediccion {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Constructor para guardar todo desde DS
     public Prediccion(Vuelo vuelo, TipoPrevision prevision, Double probabilidad,
                       Double latencia, String explicabilidad) {
         this.vuelo = vuelo;
@@ -55,9 +54,5 @@ public class Prediccion {
         this.latencia = latencia;
         this.explicabilidad = explicabilidad;
     }
-
-    // Constructor antiguo para compatibilidad
-    public Prediccion(Vuelo vuelo, TipoPrevision prevision, Double probabilidad) {
-        this(vuelo, prevision, probabilidad, null, null);
-    }
 }
+

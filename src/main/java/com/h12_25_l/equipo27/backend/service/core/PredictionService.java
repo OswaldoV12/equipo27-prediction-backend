@@ -1,11 +1,11 @@
 package com.h12_25_l.equipo27.backend.service.core;
 
 import com.h12_25_l.equipo27.backend.client.DsApiClient;
+import com.h12_25_l.equipo27.backend.dto.batch.CsvPredictRowDTO;
 import com.h12_25_l.equipo27.backend.dto.core.*;
 import com.h12_25_l.equipo27.backend.dto.externalapi.WeatherDataDTO;
 import com.h12_25_l.equipo27.backend.entity.*;
 import com.h12_25_l.equipo27.backend.enums.TipoPrevision;
-import com.h12_25_l.equipo27.backend.exception.ExternalServiceException;
 import com.h12_25_l.equipo27.backend.exception.ValidationException;
 import com.h12_25_l.equipo27.backend.repository.*;
 import com.h12_25_l.equipo27.backend.service.externalapi.WeatherService;
@@ -14,7 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class PredictionService {
@@ -42,108 +43,102 @@ public class PredictionService {
         this.prediccionRepository = prediccionRepository;
     }
 
+    // --- Metodo para el Json---
     @Transactional
-    public PredictResponseDTO predictAndSave(PredictRequestDTO request) {
+    public List<PredictResponseDTO> predictAndSaveMultiple(List<PredictRequestDTO> requests) {
 
-        // --- Validaciones básicas ---
-        if (request.origen().equals(request.destino())) {
-            LOG.warn("Origen y destino iguales: {}", request.origen());
-            throw new ValidationException("Origen y destino no pueden ser iguales");
-        }
+        return requests.stream().map(request -> {
 
-        // --- Buscar entidades maestras en BD ---
-        Aerolinea aerolinea = aerolineaRepository.findAll()
-                .stream()
-                .filter(a -> a.getIata().equals(request.aerolinea()))
-                .findFirst()
-                .orElseThrow(() -> new ValidationException("Aerolinea no encontrada: " + request.aerolinea()));
+            // --- Validaciones ---
+            if (request.origen().equals(request.destino())) {
+                throw new ValidationException("Origen y destino no pueden ser iguales");
+            }
 
-        Aeropuerto origen = aeropuertoRepository.findAll()
-                .stream()
-                .filter(a -> a.getIata().equals(request.origen()))
-                .findFirst()
-                .orElseThrow(() -> new ValidationException("Aeropuerto origen no encontrado: " + request.origen()));
+            Aerolinea aerolinea = aerolineaRepository.findAll()
+                    .stream().filter(a -> a.getIata().equals(request.aerolinea()))
+                    .findFirst().orElseThrow(() -> new ValidationException("Aerolinea no encontrada"));
 
-        Aeropuerto destino = aeropuertoRepository.findAll()
-                .stream()
-                .filter(a -> a.getIata().equals(request.destino()))
-                .findFirst()
-                .orElseThrow(() -> new ValidationException("Aeropuerto destino no encontrado: " + request.destino()));
+            Aeropuerto origen = aeropuertoRepository.findAll()
+                    .stream().filter(a -> a.getIata().equals(request.origen()))
+                    .findFirst().orElseThrow(() -> new ValidationException("Aeropuerto origen no encontrado"));
 
-        // --- Obtener clima ---
-        WeatherDataDTO clima;
-        try {
-            clima = weatherService.obtenerClima(
-                    origen.getLatitud(),
-                    origen.getLongitud(),
-                    request.fecha_partida()
+            Aeropuerto destino = aeropuertoRepository.findAll()
+                    .stream().filter(a -> a.getIata().equals(request.destino()))
+                    .findFirst().orElseThrow(() -> new ValidationException("Aeropuerto destino no encontrado"));
+
+            WeatherDataDTO clima;
+            try {
+                clima = weatherService.obtenerClima(origen.getLatitud(), origen.getLongitud(), request.fecha_partida());
+            } catch (Exception e) {
+                clima = new WeatherDataDTO(20.0, 5.0, 10.0);
+            }
+
+            DsPredictRequestDTO dsRequest = new DsPredictRequestDTO(
+                    request.aerolinea(), request.origen(), request.destino(),
+                    request.fecha_partida(), request.distancia_km(),
+                    clima.temperature2m(), clima.windSpeed10m(), clima.visibility()
             );
-            LOG.info("Clima obtenido: Temp={}°C, Viento={} km/h, Visibilidad={} km",
-                    clima.temperature2m(), clima.windSpeed10m(), clima.visibility());
-        } catch (Exception e) {
-            LOG.warn("API de clima caída, usando valores por defecto: {}", e.getMessage());
-            clima = new WeatherDataDTO(20.0, 5.0, 10.0);
+
+            // --- Enviar a DS como array ---
+            DsPredictResponseDTO[] dsResponses = dsApiClient.predictRawArray(List.of(dsRequest));
+            DsPredictResponseDTO dsResponse = dsResponses[0];
+
+            TipoPrevision tipo = DsApiClient.mapPrevisionFromDs(dsResponse.prevision());
+
+            Vuelo vuelo = new Vuelo(aerolinea, origen, destino, request.fecha_partida(), request.distancia_km());
+            vueloRepository.save(vuelo);
+
+            Prediccion prediccion = new Prediccion(
+                    vuelo,
+                    tipo,
+                    dsResponse.probabilidad(),
+                    dsResponse.latencia_ms(),
+                    dsResponse.explicabilidad()
+            );
+            prediccionRepository.save(prediccion);
+
+            return new PredictResponseDTO(
+                    tipo,
+                    dsResponse.probabilidad() * 100,
+                    dsResponse.explicabilidad()
+            );
+
+        }).toList();
+    }
+
+    //---Nuevo metodo para procesar los csv---
+
+    @Transactional
+    public Map<String, Object> predictFromCsv(List<CsvPredictRowDTO> csvRows) {
+        List<PredictResponseDTO> responses = new ArrayList<>();
+        List<String> errores = new ArrayList<>();
+
+        for (CsvPredictRowDTO row : csvRows) {
+            try {
+                PredictRequestDTO request = new PredictRequestDTO(
+                        row.aerolinea(),
+                        row.origen(),
+                        row.destino(),
+                        LocalDateTime.parse(row.fecha_partida()),
+                        Integer.parseInt(row.distancia_km())
+                );
+
+                responses.addAll(predictAndSaveMultiple(List.of(request)));
+            } catch (ValidationException ve) {
+                errores.add("Fila " + row + ": " + ve.getMessage());
+            } catch (Exception e) {
+                errores.add("Fila " + row + ": error inesperado");
+                LOG.error("Error procesando fila CSV: " + row, e);
+            }
         }
 
-        // --- Preparar request para DS ---
-        DsPredictRequestDTO dsRequest = new DsPredictRequestDTO(
-                request.aerolinea(),
-                request.origen(),
-                request.destino(),
-                request.fecha_partida(),
-                request.distancia_km(),
-                clima.temperature2m(),
-                clima.windSpeed10m(),
-                clima.visibility()
-        );
+        Map<String, Object> result = new HashMap<>();
+        result.put("predicciones", responses);
+        result.put("errores", errores);
 
-        // --- Construir array con un solo elemento ---
-        List<DsPredictRequestDTO> dsRequestList = List.of(dsRequest);
-
-        // --- Llamada al modelo DS y recibir array ---
-        DsPredictResponseDTO[] dsResponseArray;
-        try {
-            dsResponseArray = dsApiClient.predictRawArray(dsRequestList);
-        } catch (Exception e) {
-            LOG.error("Error comunicándose con DS", e);
-            throw new ExternalServiceException("Error de comunicación con DS", e);
-        }
-
-        // --- Tomar el primer elemento del array como respuesta ---
-        if (dsResponseArray == null || dsResponseArray.length == 0 || dsResponseArray[0] == null) {
-            LOG.warn("Respuesta nula o vacía del modelo DS");
-            throw new ExternalServiceException("Respuesta inválida del modelo DS");
-        }
-        DsPredictResponseDTO dsResponse = dsResponseArray[0];
-
-        TipoPrevision tipo = DsApiClient.mapPrevisionFromDs(dsResponse.prevision());
-
-        // --- Guardar Vuelo ---
-        Vuelo vuelo = new Vuelo(aerolinea, origen, destino, request.fecha_partida(), request.distancia_km());
-        vueloRepository.save(vuelo);
-
-        // --- Guardar Predicción completa ---
-        Prediccion prediccion = new Prediccion(
-                vuelo,
-                tipo,
-                dsResponse.probabilidad(),
-                dsResponse.latencia(),
-                dsResponse.explicabilidad()
-        );
-        prediccionRepository.save(prediccion);
-
-        LOG.info("Predicción realizada y guardada correctamente para vuelo {}-{}",
-                request.origen(), request.destino());
-
-        // --- Retornar solo lo visible al frontend ---
-        return new PredictResponseDTO(
-                tipo,
-                dsResponse.probabilidad() * 100
-        );
+        return result;
     }
 }
-
-
 
 
 
