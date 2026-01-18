@@ -1,7 +1,9 @@
 package com.h12_25_l.equipo27.backend.serviceTest;
 
+import com.h12_25_l.equipo27.backend.dto.core.DsPredictResponseDTO;
 import com.h12_25_l.equipo27.backend.dto.core.PredictRequestDTO;
 import com.h12_25_l.equipo27.backend.dto.core.PredictResponseDTO;
+import com.h12_25_l.equipo27.backend.dto.externalapi.WeatherDataDTO;
 import com.h12_25_l.equipo27.backend.entity.Aerolinea;
 import com.h12_25_l.equipo27.backend.entity.Aeropuerto;
 import com.h12_25_l.equipo27.backend.entity.Prediccion;
@@ -15,6 +17,7 @@ import com.h12_25_l.equipo27.backend.repository.PrediccionRepository;
 import com.h12_25_l.equipo27.backend.repository.VueloRepository;
 import com.h12_25_l.equipo27.backend.client.DsApiClient;
 import com.h12_25_l.equipo27.backend.service.core.PredictionService;
+import com.h12_25_l.equipo27.backend.service.externalapi.WeatherService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,67 +31,59 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PredictionServiceTest {
+class PredictionServiceTest {
 
     @InjectMocks
     private PredictionService predictionService;
+
     @Mock
     private DsApiClient dsApiClient;
+
+    @Mock
+    private WeatherService weatherService;
+
     @Mock
     private AerolineaRepository aerolineaRepository;
+
     @Mock
     private AeropuertoRepository aeropuertoRepository;
-    @Mock
-    private PrediccionRepository prediccionRepository;
+
     @Mock
     private VueloRepository vueloRepository;
 
-    @Test
-    void predictAndSave_shouldThrowException_whenOrigenEqualsDestino(){
+    @Mock
+    private PrediccionRepository prediccionRepository;
 
-        //Arrange
-        PredictRequestDTO requestDTO = new PredictRequestDTO(
+    // -------------------------
+    // VALIDACIONES
+    // -------------------------
+
+    @Test
+    void shouldThrowException_whenOrigenEqualsDestino() {
+
+        PredictRequestDTO request = new PredictRequestDTO(
                 "AZ",
                 "GIG",
                 "GIG",
-                LocalDateTime.of(2025, 11, 10, 14,30),
+                LocalDateTime.of(2025, 11, 10, 14, 30),
                 350
         );
 
-        //Act and Assert
-        ValidationException exception = assertThrows(
+        ValidationException ex = assertThrows(
                 ValidationException.class,
-                () -> predictionService.predictAndSave(requestDTO)
+                () -> predictionService.predictAndSave(request)
         );
 
-        assertEquals("Origen y destino no pueden ser iguales", exception.getMessage());
+        assertEquals("Origen y destino no pueden ser iguales", ex.getMessage());
 
-        verifyNoInteractions(dsApiClient);
+        verifyNoInteractions(dsApiClient, weatherService);
     }
 
     @Test
-    void shouldThrowExceptionWhenDsResponseIsNull(){
-
-        //Arrange
-        PredictRequestDTO requestDTO = validRequest();
-
-        when(dsApiClient.predict(requestDTO)).thenReturn(null);
-
-        ExternalServiceException exception = assertThrows(
-                ExternalServiceException.class,
-                () -> predictionService.predictAndSave(requestDTO)
-        );
-
-        assertEquals("Respuesta inválida del modelo DS",exception.getMessage());
-    }
-
-    @Test
-    void shouldThrowExceptionWhenAerolineaNotFound() {
+    void shouldThrowException_whenAerolineaNotFound() {
 
         PredictRequestDTO request = validRequest();
-        PredictResponseDTO response = validResponse();
 
-        when(dsApiClient.predict(request)).thenReturn(response);
         when(aerolineaRepository.findAll()).thenReturn(List.of());
 
         ValidationException ex = assertThrows(
@@ -99,37 +94,70 @@ public class PredictionServiceTest {
         assertTrue(ex.getMessage().contains("Aerolinea no encontrada"));
     }
 
+    // -------------------------
+    // DS + CLIMA
+    // -------------------------
+
+    @Test
+    void shouldThrowException_whenDsResponseIsNull() {
+
+        PredictRequestDTO request = validRequest();
+
+        when(aerolineaRepository.findAll()).thenReturn(List.of(mockAerolinea()));
+        when(aeropuertoRepository.findAll()).thenReturn(List.of(mockOrigen(), mockDestino()));
+        when(weatherService.obtenerClima(anyDouble(), anyDouble(), any()))
+                .thenReturn(mockWeather());
+
+        when(dsApiClient.predictRaw(any()))
+                .thenReturn(null);
+
+        ExternalServiceException ex = assertThrows(
+                ExternalServiceException.class,
+                () -> predictionService.predictAndSave(request)
+        );
+
+        assertEquals("Respuesta inválida del modelo DS", ex.getMessage());
+    }
+
+    // -------------------------
+    // CASO FELIZ
+    // -------------------------
+
     @Test
     void shouldPredictAndSaveSuccessfully() {
 
         PredictRequestDTO request = validRequest();
-        PredictResponseDTO response = validResponse();
 
-        when(dsApiClient.predict(request)).thenReturn(response);
         when(aerolineaRepository.findAll()).thenReturn(List.of(mockAerolinea()));
         when(aeropuertoRepository.findAll()).thenReturn(List.of(mockOrigen(), mockDestino()));
+        when(weatherService.obtenerClima(anyDouble(), anyDouble(), any()))
+                .thenReturn(mockWeather());
+
+        when(dsApiClient.predictRaw(any()))
+                .thenReturn(validDsResponse());
 
         PredictResponseDTO result = predictionService.predictAndSave(request);
 
         assertNotNull(result);
         assertEquals(TipoPrevision.Retrasado, result.prevision());
+        assertEquals(78.0, result.probabilidad());
 
         verify(vueloRepository).save(any(Vuelo.class));
         verify(prediccionRepository).save(any(Prediccion.class));
     }
+
+    // -------------------------
+    // HELPERS
+    // -------------------------
 
     private PredictRequestDTO validRequest() {
         return new PredictRequestDTO(
                 "AZ",
                 "GIG",
                 "GRU",
-                LocalDateTime.of(2025, 11, 10, 14,30),
+                LocalDateTime.of(2025, 11, 10, 14, 30),
                 350
         );
-    }
-
-    private PredictResponseDTO validResponse() {
-        return new PredictResponseDTO(TipoPrevision.Retrasado, 0.78);
     }
 
     private Aerolinea mockAerolinea() {
@@ -141,6 +169,8 @@ public class PredictionServiceTest {
     private Aeropuerto mockOrigen() {
         Aeropuerto a = new Aeropuerto();
         a.setIata("GIG");
+        a.setLatitud(10.0);
+        a.setLongitud(-84.0);
         return a;
     }
 
@@ -150,4 +180,17 @@ public class PredictionServiceTest {
         return a;
     }
 
+    private WeatherDataDTO mockWeather() {
+        return new WeatherDataDTO(25.0, 10.0, 8.0);
+    }
+
+    private DsPredictResponseDTO validDsResponse() {
+        return new DsPredictResponseDTO(
+                "retrasado",
+                0.78,
+                1.2,
+                "Alta congestión"
+        );
+    }
 }
+
