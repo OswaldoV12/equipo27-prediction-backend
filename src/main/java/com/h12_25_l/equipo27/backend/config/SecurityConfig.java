@@ -18,8 +18,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())   // Desactivar CSRF para permitir POST desde Postman
-                .cors(Customizer.withDefaults())  // Habilitar CORS (aunque desde Postman no es necesario)
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**")
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/login",
@@ -28,10 +29,13 @@ public class SecurityConfig {
                                 "/api/aeropuertos/**",
                                 "/api/distancia/**",
                                 "/api/predict/**",
-                                "/api/metrics/**"
-                        ).permitAll()  // Rutas públicas
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .anyRequest().authenticated()             // Todo lo demás protegido
+                                "/api/metrics/**",
+                                "/h2-console/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.disable())
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
