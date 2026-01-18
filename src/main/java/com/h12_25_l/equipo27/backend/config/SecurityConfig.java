@@ -15,12 +15,16 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
+        //.ignoringRequestMatchers("/h2-console/**")
         http
+<<<<<<< HEAD
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/h2-console/**")
                         .ignoringRequestMatchers("/api/**")
                         .ignoringRequestMatchers("/auth/**")
+=======
+                .csrf(csrf -> csrf.disable()
+>>>>>>> origin/JO-backend
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
