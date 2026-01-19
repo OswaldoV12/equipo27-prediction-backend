@@ -28,6 +28,6 @@ public record DsPredictResponseDTO(
                 description = "Explicación textual del motivo de la predicción",
                 example = "La aerolínea presenta retrasos recurrentes en esta franja horaria"
         )
-        String explicabilidad
+        DsExplicabilidadDTO explicabilidad
 ) {}
 

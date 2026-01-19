@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,25 +27,34 @@ public class PredictionController {
         this.csvParserService = csvParserService;
     }
 
-    // --- Endpoint original para JSON ---
+    // --- Endpoint JSON con soporte explain ---
     @PostMapping("/predict")
-    public ResponseEntity<?> predict(@RequestBody @Valid List<PredictRequestDTO> requests) {
-        List<PredictResponseDTO> responses = predictionService.predictAndSaveMultiple(requests);
+    public ResponseEntity<?> predict(
+            @RequestBody @Valid List<PredictRequestDTO> requests,
+            @RequestParam(name = "explain", required = false, defaultValue = "false") boolean explain
+    ) {
+        // Validación: solo un vuelo si explain=true
+        if (explain && requests.size() != 1) {
+            return ResponseEntity.badRequest()
+                    .body("Explanación solo soportada para un vuelo a la vez.");
+        }
+
+        // Llamada al servicio pasando explain
+        List<PredictResponseDTO> responses = predictionService.predictAndSaveMultiple(requests, explain);
 
         if (responses.size() == 1) {
             return ResponseEntity.ok(responses.get(0));
-        } else {
-            return ResponseEntity.ok(responses);
         }
+        return ResponseEntity.ok(responses);
     }
 
-    // --- Nuevo endpoint para CSV ---
+    // --- Endpoint CSV ---
     @PostMapping("/predict/csv")
     public ResponseEntity<?> predictCsv(@RequestParam("file") MultipartFile file) {
         try {
             List<CsvPredictRowDTO> csvRows = csvParserService.parse(file);
 
-            // Reusar PredictionService para procesar CSV
+            // PredictionService para procesar CSV
             Map<String, Object> result = predictionService.predictFromCsv(csvRows);
 
             return ResponseEntity.ok(result);
@@ -55,5 +63,6 @@ public class PredictionController {
         }
     }
 }
+
 
 

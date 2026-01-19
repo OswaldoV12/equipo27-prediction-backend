@@ -32,7 +32,7 @@ public class DashboardController {
         return dashboardService.getHistory(vueloId);
     }
 
-    // Nuevo endpoint: historial global de todos los vuelos
+    // Historial global de todos los vuelos
     @GetMapping("/global-history")
     public List<PredictionHistoryDTO> getGlobalHistory() {
         return dashboardService.getGlobalHistory();

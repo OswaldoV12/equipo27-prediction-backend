@@ -1,5 +1,6 @@
 package com.h12_25_l.equipo27.backend.service.core;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.h12_25_l.equipo27.backend.client.DsApiClient;
 import com.h12_25_l.equipo27.backend.dto.batch.CsvPredictRowDTO;
 import com.h12_25_l.equipo27.backend.dto.core.*;
@@ -28,43 +29,47 @@ public class PredictionService {
     private final AeropuertoRepository aeropuertoRepository;
     private final VueloRepository vueloRepository;
     private final PrediccionRepository prediccionRepository;
+    private final ObjectMapper objectMapper;
 
     public PredictionService(DsApiClient dsApiClient,
                              WeatherService weatherService,
                              AerolineaRepository aerolineaRepository,
                              AeropuertoRepository aeropuertoRepository,
                              VueloRepository vueloRepository,
-                             PrediccionRepository prediccionRepository) {
+                             PrediccionRepository prediccionRepository,
+                             ObjectMapper objectMapper) {
         this.dsApiClient = dsApiClient;
         this.weatherService = weatherService;
         this.aerolineaRepository = aerolineaRepository;
         this.aeropuertoRepository = aeropuertoRepository;
         this.vueloRepository = vueloRepository;
         this.prediccionRepository = prediccionRepository;
+        this.objectMapper = objectMapper;
     }
 
-    // --- Metodo para el Json---
     @Transactional
-    public List<PredictResponseDTO> predictAndSaveMultiple(List<PredictRequestDTO> requests) {
+    public List<PredictResponseDTO> predictAndSaveMultiple(List<PredictRequestDTO> requests, boolean explain) {
+        List<PredictResponseDTO> results = new ArrayList<>();
 
-        return requests.stream().map(request -> {
+        for (PredictRequestDTO request : requests) {
 
-            // --- Validaciones ---
-            if (request.origen().equals(request.destino())) {
+            if (request.origen().equals(request.destino()))
                 throw new ValidationException("Origen y destino no pueden ser iguales");
-            }
 
-            Aerolinea aerolinea = aerolineaRepository.findAll()
-                    .stream().filter(a -> a.getIata().equals(request.aerolinea()))
-                    .findFirst().orElseThrow(() -> new ValidationException("Aerolinea no encontrada"));
+            Aerolinea aerolinea = aerolineaRepository.findAll().stream()
+                    .filter(a -> a.getIata().equals(request.aerolinea()))
+                    .findFirst()
+                    .orElseThrow(() -> new ValidationException("Aerolinea no encontrada"));
 
-            Aeropuerto origen = aeropuertoRepository.findAll()
-                    .stream().filter(a -> a.getIata().equals(request.origen()))
-                    .findFirst().orElseThrow(() -> new ValidationException("Aeropuerto origen no encontrado"));
+            Aeropuerto origen = aeropuertoRepository.findAll().stream()
+                    .filter(a -> a.getIata().equals(request.origen()))
+                    .findFirst()
+                    .orElseThrow(() -> new ValidationException("Aeropuerto origen no encontrado"));
 
-            Aeropuerto destino = aeropuertoRepository.findAll()
-                    .stream().filter(a -> a.getIata().equals(request.destino()))
-                    .findFirst().orElseThrow(() -> new ValidationException("Aeropuerto destino no encontrado"));
+            Aeropuerto destino = aeropuertoRepository.findAll().stream()
+                    .filter(a -> a.getIata().equals(request.destino()))
+                    .findFirst()
+                    .orElseThrow(() -> new ValidationException("Aeropuerto destino no encontrado"));
 
             WeatherDataDTO clima;
             try {
@@ -74,39 +79,55 @@ public class PredictionService {
             }
 
             DsPredictRequestDTO dsRequest = new DsPredictRequestDTO(
-                    request.aerolinea(), request.origen(), request.destino(),
-                    request.fecha_partida(), request.distancia_km(),
-                    clima.temperature2m(), clima.windSpeed10m(), clima.visibility()
+                    request.aerolinea(),
+                    request.origen(),
+                    request.destino(),
+                    request.fecha_partida(),
+                    request.distancia_km(),
+                    clima.temperature2m(),
+                    clima.windSpeed10m(),
+                    clima.visibility()
             );
 
-            // --- Enviar a DS como array ---
-            DsPredictResponseDTO[] dsResponses = dsApiClient.predictRawArray(List.of(dsRequest));
-            DsPredictResponseDTO dsResponse = dsResponses[0];
+            // --- IMPRIMIR JSON ANTES DE ENVIAR ---
+            try {
+                String json = objectMapper.writeValueAsString(dsRequest);
+                System.out.println("JSON que se enviará a DS: " + json);
+            } catch (Exception e) {
+                System.out.println("Error serializando request a JSON: " + e.getMessage());
+            }
+
+
+            DsPredictResponseDTO dsResponse = dsApiClient.predictRaw(dsRequest, explain)[0];
+
+            LOG.info("===== DS Response crudo =====\n{}", dsResponse);
 
             TipoPrevision tipo = DsApiClient.mapPrevisionFromDs(dsResponse.prevision());
 
             Vuelo vuelo = new Vuelo(aerolinea, origen, destino, request.fecha_partida(), request.distancia_km());
             vueloRepository.save(vuelo);
 
-            Prediccion prediccion = new Prediccion(
-                    vuelo,
-                    tipo,
-                    dsResponse.probabilidad(),
-                    dsResponse.latencia_ms(),
-                    dsResponse.explicabilidad()
-            );
+            // Guardar explicabilidad JSON en BD
+            String explicabilidadJson = null;
+            String explicabilidadTexto = null;
+            if (dsResponse.explicabilidad() != null) {
+                try {
+                    explicabilidadJson = objectMapper.writeValueAsString(dsResponse.explicabilidad());
+                    explicabilidadTexto = dsResponse.explicabilidad().toHumanReadable();
+                } catch (Exception e) {
+                    LOG.warn("Error serializando explicabilidad: {}", e.getMessage());
+                }
+            }
+
+            Prediccion prediccion = new Prediccion(vuelo, tipo, dsResponse.probabilidad(),
+                    dsResponse.latencia_ms(), explicabilidadJson);
             prediccionRepository.save(prediccion);
 
-            return new PredictResponseDTO(
-                    tipo,
-                    dsResponse.probabilidad() * 100,
-                    dsResponse.explicabilidad()
-            );
+            results.add(new PredictResponseDTO(tipo, dsResponse.probabilidad() * 100, explicabilidadTexto));
+        }
 
-        }).toList();
+        return results;
     }
-
-    //---Nuevo metodo para procesar los csv---
 
     @Transactional
     public Map<String, Object> predictFromCsv(List<CsvPredictRowDTO> csvRows) {
@@ -116,19 +137,18 @@ public class PredictionService {
         for (CsvPredictRowDTO row : csvRows) {
             try {
                 PredictRequestDTO request = new PredictRequestDTO(
-                        row.aerolinea(),
-                        row.origen(),
-                        row.destino(),
+                        row.aerolinea(), row.origen(), row.destino(),
                         LocalDateTime.parse(row.fecha_partida()),
                         Integer.parseInt(row.distancia_km())
                 );
 
-                responses.addAll(predictAndSaveMultiple(List.of(request)));
+                responses.addAll(predictAndSaveMultiple(List.of(request), false)); // batch, explain=false
+
             } catch (ValidationException ve) {
                 errores.add("Fila " + row + ": " + ve.getMessage());
             } catch (Exception e) {
                 errores.add("Fila " + row + ": error inesperado");
-                LOG.error("Error procesando fila CSV: " + row, e);
+                LOG.error("Error procesando fila CSV: {}", row, e);
             }
         }
 
@@ -139,6 +159,8 @@ public class PredictionService {
         return result;
     }
 }
+
+
 
 
 
