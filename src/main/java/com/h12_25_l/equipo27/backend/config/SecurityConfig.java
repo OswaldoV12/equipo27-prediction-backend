@@ -17,6 +17,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         //.ignoringRequestMatchers("/h2-console/**")
+        //.cors(Customizer.withDefaults())
         http
                 .csrf(csrf -> csrf.disable()
                 )
@@ -29,7 +30,9 @@ public class SecurityConfig {
                                 "/api/distancia/**",
                                 "/api/predict/**",
                                 "/api/metrics/**",
-                                "/h2-console/**"
+                                "/h2-console/**",
+                                "/telegram/**",
+                                "/notificaciones/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
