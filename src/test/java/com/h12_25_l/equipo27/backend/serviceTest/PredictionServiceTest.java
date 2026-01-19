@@ -1,5 +1,7 @@
 package com.h12_25_l.equipo27.backend.serviceTest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.h12_25_l.equipo27.backend.client.DsApiClient;
 import com.h12_25_l.equipo27.backend.dto.core.DsPredictResponseDTO;
 import com.h12_25_l.equipo27.backend.dto.core.PredictRequestDTO;
@@ -52,6 +54,9 @@ class PredictionServiceTest {
     @Mock
     private UsuarioRepository usuarioRepository;
 
+    @Mock
+    private ObjectMapper objectMapper;
+
     // -------------------------
     // VALIDACIONES
     // -------------------------
@@ -69,7 +74,7 @@ class PredictionServiceTest {
 
         ValidationException ex = assertThrows(
                 ValidationException.class,
-                () -> predictionService.predictAndSaveMultiple(List.of(request))
+                () -> predictionService.predictAndSaveMultiple(List.of(request), false)
         );
 
         assertEquals("Origen y destino no pueden ser iguales", ex.getMessage());
@@ -81,7 +86,7 @@ class PredictionServiceTest {
     // -------------------------
 
     @Test
-    void shouldPredictAndSaveSuccessfully() {
+    void shouldPredictAndSaveSuccessfully() throws JsonProcessingException {
 
         PredictRequestDTO request = validRequest();
 
@@ -94,14 +99,17 @@ class PredictionServiceTest {
         when(weatherService.obtenerClima(anyDouble(), anyDouble(), any()))
                 .thenReturn(mockWeather());
 
-        when(dsApiClient.predictRawArray(any()))
+        when(dsApiClient.predictRaw(any(), anyBoolean()))
                 .thenReturn(new DsPredictResponseDTO[]{ validDsResponse() });
 
         when(usuarioRepository.findByRol(Roles.INVITADO))
                 .thenReturn(Optional.of(mockUsuarioInvitado()));
 
+        when(objectMapper.writeValueAsString(any()))
+                .thenReturn("{}");
+
         List<PredictResponseDTO> result =
-                predictionService.predictAndSaveMultiple(List.of(request));
+                predictionService.predictAndSaveMultiple(List.of(request), false);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -155,7 +163,7 @@ class PredictionServiceTest {
                 "retrasado",
                 0.78,
                 1.2,
-                "Alta congestión"
+                null
         );
     }
 
