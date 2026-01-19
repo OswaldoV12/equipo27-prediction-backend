@@ -1,5 +1,6 @@
 package com.h12_25_l.equipo27.backend.service.usuario;
 
+import com.h12_25_l.equipo27.backend.dto.usuario.ListaUsuariosDTO;
 import com.h12_25_l.equipo27.backend.dto.usuario.UserProfileDTO;
 import com.h12_25_l.equipo27.backend.entity.Usuario;
 import com.h12_25_l.equipo27.backend.exception.UnauthorizedException;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -61,5 +63,17 @@ public class UsuarioService {
             return null;
         }
         return new UserProfileDTO(user.getUsername(), user.getEmail(), user.getRol());
+    }
+
+    public List<ListaUsuariosDTO> listaUsuarios(){
+        return userRepository.findAll().stream()
+                .map(user -> new ListaUsuariosDTO(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getRol()
+                ))
+                .toList();
+
     }
 }
