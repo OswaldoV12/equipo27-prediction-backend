@@ -1,16 +1,20 @@
 package com.h12_25_l.equipo27.backend.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class WebClientConfig {
+
     @Bean
-    public WebClient webClient() {
+    public WebClient webClient(
+            @Value("${ds.api.base-url}") String baseUrl) {
+
         return WebClient.builder()
-                .baseUrl("http://localhost:" +
-                        "8000")
+                .baseUrl(baseUrl)
                 .build();
     }
 }
+

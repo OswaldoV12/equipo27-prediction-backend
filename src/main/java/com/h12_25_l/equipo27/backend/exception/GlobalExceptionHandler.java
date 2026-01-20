@@ -70,6 +70,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(details);
     }
 
+    //Manejo de
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ExceptionDetails> handleUnauthorized(
+            UnauthorizedException ex, HttpServletRequest request) {
+
+        LOG.warn("Autenticación fallida: {}", ex.getMessage());
+
+        ExceptionDetails details = new ExceptionDetails(
+                HttpStatus.UNAUTHORIZED.value(),
+                ex.getErrorCode(),
+                ex.getMessage(),
+                "WARN",
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(details);
+    }
+
+
     // Manejo de errores inesperados y RuntimeExceptions (HTTP 500)
     @ExceptionHandler({Exception.class, RuntimeException.class})
     public ResponseEntity<ExceptionDetails> handleGeneralException(

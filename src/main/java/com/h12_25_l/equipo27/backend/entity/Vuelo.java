@@ -19,6 +19,10 @@ public class Vuelo {
     private Long id;
 
     @ManyToOne(optional = false)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
+
+    @ManyToOne(optional = false)
     @JoinColumn(name = "aerolinea_id")
     private Aerolinea aerolinea;
 
@@ -36,8 +40,18 @@ public class Vuelo {
     @Column(name = "distancia_km", nullable = false)
     private Integer distanciaKm;
 
-    //constructor
-    public Vuelo(Aerolinea aerolinea, Aeropuerto origen, Aeropuerto destino, LocalDateTime fechaPartida, Integer distanciaKm) {
+    @Column(nullable = false)
+    private Boolean activo = true;
+
+    public Vuelo(
+            Usuario usuario,
+            Aerolinea aerolinea,
+            Aeropuerto origen,
+            Aeropuerto destino,
+            LocalDateTime fechaPartida,
+            Integer distanciaKm
+    ) {
+        this.usuario = usuario;
         this.aerolinea = aerolinea;
         this.origen = origen;
         this.destino = destino;

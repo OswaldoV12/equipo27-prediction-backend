@@ -1,7 +1,12 @@
 spring:
   application:
     name: prediction-backend-api
+
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+ds:
+  api:
+    base-url: https://flight-delay-api-wndv.onrender.com

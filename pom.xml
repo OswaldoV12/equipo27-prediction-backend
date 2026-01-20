@@ -70,6 +70,12 @@
 			<version>42.7.7</version>
 		</dependency>
 
+		<!-- Flyway-->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+
 		<!-- Validaciones -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -88,6 +94,18 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- Seguridad -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>4.4.0</version>
 		</dependency>
 
 	</dependencies>

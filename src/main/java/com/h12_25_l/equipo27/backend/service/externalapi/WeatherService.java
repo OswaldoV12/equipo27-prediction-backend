@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,14 +18,17 @@ public class WeatherService {
 
     private static final Logger LOG = LoggerFactory.getLogger(WeatherService.class);
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    // Inyección de RestTemplate desde constructor
+    public WeatherService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public WeatherDataDTO obtenerClima(double lat, double lon, LocalDateTime fechaPartida) {
         try {
-            // Calcular días de pronóstico
             int forecastDays = (int) (fechaPartida.toLocalDate().toEpochDay() - LocalDate.now().toEpochDay()) + 1;
 
-            // Construir URL
             String url = UriComponentsBuilder.fromHttpUrl("https://api.open-meteo.com/v1/forecast")
                     .queryParam("latitude", lat)
                     .queryParam("longitude", lon)
@@ -35,7 +39,6 @@ public class WeatherService {
 
             LOG.info("Llamando a Open-Meteo: {}", url);
 
-            // Llamada a la API
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
             if (response == null || !response.containsKey("hourly")) {
                 throw new RuntimeException("Respuesta vacía de Open-Meteo");
@@ -47,16 +50,12 @@ public class WeatherService {
             List<Double> winds = (List<Double>) hourly.get("wind_speed_10m");
             List<Double> visibility = (List<Double>) hourly.get("visibility");
 
-            // Redondear fechaPartida al entero más cercano de hora
             LocalDateTime roundedDateTime = redondearHora(fechaPartida);
-
-            // Buscar índice más cercano
             int index = encontrarHoraCercana(times, roundedDateTime);
 
             LOG.info("Hora seleccionada: {}, Temp={}°C, Viento={} km/h, Visibilidad={} km",
                     times.get(index), temps.get(index), winds.get(index), visibility.get(index));
 
-            // Retornar WeatherDataDTO
             return new WeatherDataDTO(
                     temps.get(index),
                     winds.get(index),
@@ -73,7 +72,7 @@ public class WeatherService {
     // Métodos auxiliares
     // -------------------
 
-    private LocalDateTime redondearHora(LocalDateTime fechaPartida) {
+    protected LocalDateTime redondearHora(LocalDateTime fechaPartida) {
         int minute = fechaPartida.getMinute();
         if (minute >= 30) {
             return fechaPartida.plusHours(1).withMinute(0).withSecond(0).withNano(0);
@@ -82,7 +81,7 @@ public class WeatherService {
         }
     }
 
-    private int encontrarHoraCercana(List<String> times, LocalDateTime targetDateTime) {
+    protected int encontrarHoraCercana(List<String> times, LocalDateTime targetDateTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
         int closestIndex = 0;
         long minDiff = Long.MAX_VALUE;
@@ -104,6 +103,7 @@ public class WeatherService {
         return closestIndex;
     }
 }
+
 
 
 

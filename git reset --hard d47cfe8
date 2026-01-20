@@ -1,0 +1,47 @@
+[33m62dc2fd[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mBY-prediction-backend[m[33m, [m[1;31morigin/Yg-backend-DB[m[33m)[m Agregar soporte completo de métricas DS: guardar, procesar y devolver según el nuevo contrato
+[33m8ea023b[m feat: cálculo de distancia entre aeropuertos e integración Open-Meteo
+[33m5d4abc7[m Configura perfiles YML, persiste H2 en archivo, reorganiza DTOs y servicios
+[33mc0c76ae[m Configura perfiles YML, persiste H2 en archivo, reorganiza DTOs y servicios
+[33md47cfe8[m[33m ([m[1;31morigin/JO-backend[m[33m)[m Implementacion de applicantion.yaml y eliminacion de application.properties
+[33mc964f51[m Merge remote-tracking branch 'origin/YG-prediction-backend-exception' into JO-backend
+[33m0ace38b[m Merge remote-tracking branch 'origin/BY-prediction-backend' into JO-backend
+[33m2107b5c[m Implementacion de test
+[33m6f7fe63[m Corrigiendo clase Prediccion.java
+[33me8631ae[m Merge remote-tracking branch 'origin/VV-unit-test' into JO-backend
+[33meb9f8cf[m Cambios: Cambio de version de spring, correcicción de dependencias, organización de paquetes, implmentacion de sweager, implentanción de DTOS
+[33m8a1bdc6[m[33m ([m[1;31morigin/VV-unit-test[m[33m)[m Update README.md
+[33m4d9e564[m Update README.md
+[33m07f3ccd[m Redacción de la documentación funcional en el README.md
+[33mb8fa955[m Creacion del todos los unit tests de DashboardService, funciona correctamente
+[33m2024b7b[m[33m ([m[1;31morigin/YG-prediction-backend-exception[m[33m)[m feat: predicciones batch con CSV y manejo de errores multiples
+[33me17f244[m Creacion del todos los unit tests de PredictionService, funciona correctamente
+[33mf1e5cef[m Creacion del unit test shouldThrowExceptionWhenDsResponseIsNull funciona correctamente
+[33m7905ad4[m Agregrar dependencia mockito para tests y creacion del PredictionServiceTest para validar que el origen y destino no pueden ser iguales
+[33m11dd5fa[m Agregar las anotaciones de Lombok en entidades
+[33m927f02e[m[33m ([m[1;31morigin/BY-prediction-backend[m[33m)[m cors config para comunicacio con front
+[33mcc89715[m rama funcionando: agregue dependencias (h2) y cambie el build (agregue version de lombok) en el pom para que compile
+[33md780ba7[m merge desde la rama de yadir
+[33mb896aeb[m Merge branch 'develop' into BY-prediction-backend
+[33mef853d3[m Ajuste de nombres RequestDTO y PredictionServices
+[33mbde9b26[m feat: base de datos, predicciones persistidas y dashboard listo
+[33mc79aed1[m[33m ([m[1;31morigin/develop[m[33m, [m[1;32mdevelop[m[33m)[m Merge remote-tracking branch 'origin/develop' into develop
+[33m73900ce[m Conexión Completada, ajuste de DTO con guión bajo e implemetnación de constructor em ves de anotación
+[33m82b2d5f[m Corrigiendo constructor
+[33m67d9292[m Corrigiendo constructor
+[33m07a79b7[m Merge remote-tracking branch 'origin/YG-prediction-backend-exception' into develop
+[33me086b4e[m modificacion en controller (constructor)
+[33mffdbcf9[m Merge branch 'VV-prediction-backend' into develop
+[33m4e2cb66[m feat: unificar manejo de errores, mejorar validación de DTOs y agregar regex IATA
+[33mb630ca7[m[33m ([m[1;31morigin/JOVM-prediction-backend[m[33m)[m Conexion a API prueba
+[33m48b9c87[m Eliminar placeholderFile.txt de service y cambiar la validacion de Size por expresion regular para validar que la aerolinea, origen y destino sean manejados por letras
+[33mfabc5c9[m Elimino placeHolderFile.txt y agrego controller + service sin lógica
+[33m2dd2efb[m Agrega DTOs para /predict con validaciones
+[33m5515f8f[m Agrego PredictController
+[33mf8b86a2[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Configuracion y estrutuctura del proyecto
+[33m5537e3f[m Configuracion y estrutuctura del proyecto
+[33m7b38de9[m Configuracion y estrutuctura del proyecto
+[33m138f3c1[m Configuracion y estrutuctura del proyecto
+[33m4980912[m Configuracion y estrutuctura del proyecto
+[33mbc60697[m eerge branch 'main' of https://github.com/OswaldoV12/equipo27-prediction-backend
+[33mc4703d0[m Poyecto limpio desde cero
+[33mc345cfa[m Initial commit
