@@ -2,6 +2,7 @@ package com.h12_25_l.equipo27.backend.service.seguridad;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.h12_25_l.equipo27.backend.entity.Usuario;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -15,9 +16,10 @@ public class JwtService {
     private final Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
 
     // Generar token
-    public String generateToken(String email) {
+    public String generateToken(Usuario user) {
         return JWT.create()
-                .withSubject(email)
+                .withSubject(user.getEmail())
+                .withClaim("rol", user.getRol().name())
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hora
                 .sign(algorithm); // firmar token
