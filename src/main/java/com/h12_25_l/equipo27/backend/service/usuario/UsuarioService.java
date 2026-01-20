@@ -57,12 +57,9 @@ public class UsuarioService {
         return jwtService.generateToken(user);
     }
 
-    public UserProfileDTO getProfile(String email){
-        Usuario user = getEmail(email);
-        if (user == null){
-            return null;
-        }
-        return new UserProfileDTO(user.getUsername(), user.getEmail(), user.getRol());
+    public UserProfileDTO getProfile(Usuario usuario) {
+        if (usuario == null) return null;
+        return new UserProfileDTO(usuario.getUsername(), usuario.getEmail(), usuario.getRol());
     }
 
     public List<ListaUsuariosDTO> obteneerUsuarios(){
