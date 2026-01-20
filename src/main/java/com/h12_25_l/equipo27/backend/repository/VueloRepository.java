@@ -22,4 +22,6 @@ public interface VueloRepository extends JpaRepository<Vuelo, Long> {
         AND v.fechaPartida < :now
     """)
     int desactivarVuelosPasados(@Param("now") LocalDateTime now);
+
+    List<Vuelo> findByUsuarioId(Long usuarioId);
 }
