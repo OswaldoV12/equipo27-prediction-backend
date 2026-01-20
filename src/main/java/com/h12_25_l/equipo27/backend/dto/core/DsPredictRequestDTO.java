@@ -50,12 +50,23 @@ public record DsPredictRequestDTO(
         @Positive
         Integer distancia_km,
 
-        @Schema(description = "Temperatura en °C a 2 metros de altura", example = "25.3")
+        @Schema(
+                description = "Temperatura en °C a 2 metros de altura",
+                example = "25.3"
+        )
         Double temperatura,
 
-        @Schema(description = "Velocidad del viento a 10 metros de altura en km/h", example = "12.1")
+        @Schema(
+                description = "Velocidad del viento a 10 metros de altura en km/h",
+                example = "12.1"
+        )
         Double velocidad_viento,
 
-        @Schema(description = "Visibilidad en kilómetros", example = "10.0")
+        @Schema(
+                description = "Visibilidad en kilómetros",
+                example = "10.0"
+        )
         Double visibilidad
 ) {}
+
+

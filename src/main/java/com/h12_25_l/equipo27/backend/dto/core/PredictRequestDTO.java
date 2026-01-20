@@ -59,3 +59,5 @@ public record PredictRequestDTO(
         @Positive(message = "La distancia debe ser mayor a 0")
         Integer distancia_km
 ) {}
+
+

@@ -2,13 +2,12 @@ package com.h12_25_l.equipo27.backend.dto.core;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-// DTO recibido desde el servicio de Data Science
 @Schema(description = "Respuesta del servicio de Data Science con la predicción del vuelo")
 public record DsPredictResponseDTO(
 
         @Schema(
                 description = "Resultado de la predicción generado por el modelo",
-                example = "Retrasado",
+                example = "retrasado",
                 allowableValues = {"retrasado", "no retrasado"}
         )
         String prevision,
@@ -20,14 +19,15 @@ public record DsPredictResponseDTO(
         Double probabilidad,
 
         @Schema(
-                description = "Tiempo de respuesta del modelo DS",
+                description = "Tiempo de respuesta del modelo DS en milisegundos",
                 example = "2.12"
         )
-                Double latencia,
+        Double latencia_ms,
 
         @Schema(
-                description = "Descipcion del motivo asociado al retrazo de un vuelo",
-                example = "La aerolinea AZ tiene retrazos concurrentes a la hora 14:30:00"
+                description = "Explicación textual del motivo de la predicción",
+                example = "La aerolínea presenta retrasos recurrentes en esta franja horaria"
         )
-        String explicabilidad
+        DsExplicabilidadDTO explicabilidad
 ) {}
+

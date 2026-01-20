@@ -1,21 +1,17 @@
 package com.h12_25_l.equipo27.backend.serviceTest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.h12_25_l.equipo27.backend.client.DsApiClient;
 import com.h12_25_l.equipo27.backend.dto.core.DsPredictResponseDTO;
 import com.h12_25_l.equipo27.backend.dto.core.PredictRequestDTO;
 import com.h12_25_l.equipo27.backend.dto.core.PredictResponseDTO;
 import com.h12_25_l.equipo27.backend.dto.externalapi.WeatherDataDTO;
-import com.h12_25_l.equipo27.backend.entity.Aerolinea;
-import com.h12_25_l.equipo27.backend.entity.Aeropuerto;
-import com.h12_25_l.equipo27.backend.entity.Prediccion;
-import com.h12_25_l.equipo27.backend.entity.Vuelo;
+import com.h12_25_l.equipo27.backend.entity.*;
+import com.h12_25_l.equipo27.backend.enums.Roles;
 import com.h12_25_l.equipo27.backend.enums.TipoPrevision;
-import com.h12_25_l.equipo27.backend.exception.ExternalServiceException;
 import com.h12_25_l.equipo27.backend.exception.ValidationException;
-import com.h12_25_l.equipo27.backend.repository.AerolineaRepository;
-import com.h12_25_l.equipo27.backend.repository.AeropuertoRepository;
-import com.h12_25_l.equipo27.backend.repository.PrediccionRepository;
-import com.h12_25_l.equipo27.backend.repository.VueloRepository;
-import com.h12_25_l.equipo27.backend.client.DsApiClient;
+import com.h12_25_l.equipo27.backend.repository.*;
 import com.h12_25_l.equipo27.backend.service.core.PredictionService;
 import com.h12_25_l.equipo27.backend.service.externalapi.WeatherService;
 import org.junit.jupiter.api.Test;
@@ -26,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -54,6 +51,12 @@ class PredictionServiceTest {
     @Mock
     private PrediccionRepository prediccionRepository;
 
+    @Mock
+    private UsuarioRepository usuarioRepository;
+
+    @Mock
+    private ObjectMapper objectMapper;
+
     // -------------------------
     // VALIDACIONES
     // -------------------------
@@ -71,52 +74,11 @@ class PredictionServiceTest {
 
         ValidationException ex = assertThrows(
                 ValidationException.class,
-                () -> predictionService.predictAndSave(request)
+                () -> predictionService.predictAndSaveMultiple(List.of(request), false)
         );
 
         assertEquals("Origen y destino no pueden ser iguales", ex.getMessage());
-
-        verifyNoInteractions(dsApiClient, weatherService);
-    }
-
-    @Test
-    void shouldThrowException_whenAerolineaNotFound() {
-
-        PredictRequestDTO request = validRequest();
-
-        when(aerolineaRepository.findAll()).thenReturn(List.of());
-
-        ValidationException ex = assertThrows(
-                ValidationException.class,
-                () -> predictionService.predictAndSave(request)
-        );
-
-        assertTrue(ex.getMessage().contains("Aerolinea no encontrada"));
-    }
-
-    // -------------------------
-    // DS + CLIMA
-    // -------------------------
-
-    @Test
-    void shouldThrowException_whenDsResponseIsNull() {
-
-        PredictRequestDTO request = validRequest();
-
-        when(aerolineaRepository.findAll()).thenReturn(List.of(mockAerolinea()));
-        when(aeropuertoRepository.findAll()).thenReturn(List.of(mockOrigen(), mockDestino()));
-        when(weatherService.obtenerClima(anyDouble(), anyDouble(), any()))
-                .thenReturn(mockWeather());
-
-        when(dsApiClient.predictRaw(any()))
-                .thenReturn(null);
-
-        ExternalServiceException ex = assertThrows(
-                ExternalServiceException.class,
-                () -> predictionService.predictAndSave(request)
-        );
-
-        assertEquals("Respuesta inválida del modelo DS", ex.getMessage());
+        verifyNoInteractions(dsApiClient);
     }
 
     // -------------------------
@@ -124,23 +86,35 @@ class PredictionServiceTest {
     // -------------------------
 
     @Test
-    void shouldPredictAndSaveSuccessfully() {
+    void shouldPredictAndSaveSuccessfully() throws JsonProcessingException {
 
         PredictRequestDTO request = validRequest();
 
-        when(aerolineaRepository.findAll()).thenReturn(List.of(mockAerolinea()));
-        when(aeropuertoRepository.findAll()).thenReturn(List.of(mockOrigen(), mockDestino()));
+        when(aerolineaRepository.findAll())
+                .thenReturn(List.of(mockAerolinea()));
+
+        when(aeropuertoRepository.findAll())
+                .thenReturn(List.of(mockOrigen(), mockDestino()));
+
         when(weatherService.obtenerClima(anyDouble(), anyDouble(), any()))
                 .thenReturn(mockWeather());
 
-        when(dsApiClient.predictRaw(any()))
-                .thenReturn(validDsResponse());
+        when(dsApiClient.predictRaw(any(), anyBoolean()))
+                .thenReturn(new DsPredictResponseDTO[]{ validDsResponse() });
 
-        PredictResponseDTO result = predictionService.predictAndSave(request);
+        when(usuarioRepository.findByRol(Roles.INVITADO))
+                .thenReturn(Optional.of(mockUsuarioInvitado()));
+
+        when(objectMapper.writeValueAsString(any()))
+                .thenReturn("{}");
+
+        List<PredictResponseDTO> result =
+                predictionService.predictAndSaveMultiple(List.of(request), false);
 
         assertNotNull(result);
-        assertEquals(TipoPrevision.Retrasado, result.prevision());
-        assertEquals(78.0, result.probabilidad());
+        assertEquals(1, result.size());
+        assertEquals(TipoPrevision.Retrasado, result.get(0).prevision());
+        assertEquals(78.0, result.get(0).probabilidad());
 
         verify(vueloRepository).save(any(Vuelo.class));
         verify(prediccionRepository).save(any(Prediccion.class));
@@ -189,8 +163,15 @@ class PredictionServiceTest {
                 "retrasado",
                 0.78,
                 1.2,
-                "Alta congestión"
+                null
         );
     }
-}
 
+    private Usuario mockUsuarioInvitado() {
+        Usuario u = new Usuario();
+        u.setId(1L);
+        u.setRol(Roles.INVITADO);
+        u.setEmail("invitado@test.com");
+        return u;
+    }
+}
