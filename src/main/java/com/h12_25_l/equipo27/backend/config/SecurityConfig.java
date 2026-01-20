@@ -18,6 +18,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         //.ignoringRequestMatchers("/h2-console/**")
         http
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable()
                 )
                 .authorizeHttpRequests(auth -> auth

@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class SecurityUtils {
     public static boolean isAuthenticated() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
         return auth != null
                 && auth.isAuthenticated()
                 && !(auth instanceof AnonymousAuthenticationToken);

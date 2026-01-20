@@ -9,4 +9,4 @@ spring:
 
 ds:
   api:
-    base-url: http://149.130.181.183:8000
+    base-url: https://flight-delay-api-wndv.onrender.com

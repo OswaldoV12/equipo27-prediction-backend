@@ -5,6 +5,7 @@ import com.h12_25_l.equipo27.backend.dto.usuario.LoginRequestDTO;
 import com.h12_25_l.equipo27.backend.dto.usuario.RegisterRequestDTO;
 import com.h12_25_l.equipo27.backend.dto.usuario.UserProfileDTO;
 import com.h12_25_l.equipo27.backend.entity.Usuario;
+import com.h12_25_l.equipo27.backend.seguridad.SecurityUtils;
 import com.h12_25_l.equipo27.backend.service.usuario.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -39,8 +40,8 @@ public class AuthController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/profile")
     public ResponseEntity<UserProfileDTO> getProfile(Authentication authentication) {
-        String email = authentication.getName();
-        UserProfileDTO profile = userService.getProfile(email);
+        Usuario usuario = SecurityUtils.getUsuarioActual();
+        UserProfileDTO profile = userService.getProfile(usuario);
 
         if (profile == null) {
             return ResponseEntity.notFound().build();
