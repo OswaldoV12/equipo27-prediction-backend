@@ -39,7 +39,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 path.startsWith("/api/aerolineas") ||
                 path.startsWith("/api/aeropuertos") ||
                 path.startsWith("/api/distancia") ||
-                path.startsWith("/api/metrics")
+                path.startsWith("/api/metrics") ||
+                path.startsWith("/swagger-ui.html")
         ) {
             filterChain.doFilter(request, response);
             return;
@@ -48,7 +49,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // Obtenemos del Header
         String authHeader = request.getHeader("Authorization");
-        System.out.println("JWT: "+ authHeader);
+        //System.out.println("JWT: "+ authHeader);
         if ( authHeader == null ||
                 !authHeader.startsWith("Bearer ") ||
                 authHeader.equals("Bearer null") ||
@@ -59,7 +60,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         String jwt = authHeader.substring(7); //  AQUÍ SÍ se limpia
-        System.out.println("JWT limpio: " + jwt);
+        //System.out.println("JWT limpio: " + jwt);
         // Obtenemos el email
         String email = jwtService.getUsernameFromToken(jwt);
 
