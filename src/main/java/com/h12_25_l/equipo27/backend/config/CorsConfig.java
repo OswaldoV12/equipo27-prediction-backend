@@ -11,10 +11,11 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOriginPatterns(
-                "http://localhost:*",
-                "https://*.railway.app/*",
-                        "https://flightontime-drab.vercel.app/*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        "http://localhost:*",
+                        "https://*.railway.app",
+                        "https://flightontime-drab.vercel.app"
+                )
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }
