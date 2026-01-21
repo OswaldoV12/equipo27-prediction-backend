@@ -9,4 +9,4 @@ spring:
 
 ds:
   api:
-    base-url: http://ec2-3-134-85-182.us-east-2.compute.amazonaws.com:8000/
+    base-url: http://ec2-3-134-85-182.us-east-2.compute.amazonaws.com:8000
