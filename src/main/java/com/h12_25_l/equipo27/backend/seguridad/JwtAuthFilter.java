@@ -31,6 +31,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String path = request.getRequestURI();
 
         // Rutas totalmente públicas donde NO queremos ni leer token
@@ -42,7 +47,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 path.startsWith("/api/metrics") ||
                 path.startsWith("/swagger-ui") ||
                 path.startsWith("/v3/api-docs") ||
-                path.startsWith("/actuator")
+                path.startsWith("/actuator") ||
+                path.equals("/")
         ) {
             filterChain.doFilter(request, response);
             return;
