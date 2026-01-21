@@ -40,12 +40,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 path.startsWith("/api/aeropuertos") ||
                 path.startsWith("/api/distancia") ||
                 path.startsWith("/api/metrics") ||
-                path.startsWith("/swagger-ui.html") ||
-                path.startsWith("/v3/api-docs")
+                path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/actuator")
         ) {
             filterChain.doFilter(request, response);
             return;
         }
+
 
 
         // Obtenemos del Header
