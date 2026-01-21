@@ -41,7 +41,7 @@ public class AuthController {
     @GetMapping("/profile")
     public ResponseEntity<UserProfileDTO> getProfile(Authentication authentication) {
         Usuario usuario = SecurityUtils.getUsuarioActual();
-        UserProfileDTO profile = userService.getProfile(usuario.getEmail());
+        UserProfileDTO profile = userService.getProfile(usuario);
 
         if (profile == null) {
             return ResponseEntity.notFound().build();
