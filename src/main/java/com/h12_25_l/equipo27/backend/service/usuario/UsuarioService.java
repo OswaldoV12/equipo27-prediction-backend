@@ -73,4 +73,23 @@ public class UsuarioService {
                 )).toList();
 
     }
+
+    public Usuario registerAdmin(String username, String email, String password) {
+
+        // Validar si ya existe
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new RuntimeException("El usuario ya existe");
+        }
+
+        Usuario admin = new Usuario();
+        admin.setUsername(username);
+        admin.setEmail(email);
+        admin.setPassword(passwordEncoder.encode(password));
+        admin.setRol(Roles.ADMIN);
+        admin.setChatId(null);
+
+        return userRepository.save(admin);
+    }
+
+
 }

@@ -49,4 +49,19 @@ public class AuthController {
 
         return ResponseEntity.ok(profile);
     }
+
+    @PostMapping("/admin")
+    public ResponseEntity<?> admin(@RequestBody RegisterRequestDTO request) {
+
+        userService.registerAdmin(
+                request.username(),
+                request.email(),
+                request.password()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Admin creado correctamente");
+    }
+
 }

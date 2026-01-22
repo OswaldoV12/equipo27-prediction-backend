@@ -41,6 +41,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // Rutas totalmente públicas donde NO queremos ni leer token
         if ( path.startsWith("/auth/login") ||
                 path.startsWith("/auth/register") ||
+                path.startsWith("/auth/admin") ||
                 path.startsWith("/api/aerolineas") ||
                 path.startsWith("/api/aeropuertos") ||
                 path.startsWith("/api/distancia") ||
