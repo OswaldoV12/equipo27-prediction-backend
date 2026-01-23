@@ -340,6 +340,7 @@ Swagger es el medio recomendado, Postman es opcional.
 ## 14. Posibles mejoras futuras
 
 * Rate limiting
+* Manejo de notificaciones via telegram usando N8N
 * Cacheo de predicciones
 * Versionado de la API
 * Seguimiento de predicciones por correo para usuarios registrados (via N8N) [en desarrollo]
