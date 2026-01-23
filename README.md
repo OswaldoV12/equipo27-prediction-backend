@@ -142,16 +142,6 @@ El frontend cuenta con su propio repositorio y README, donde se detallan sus tec
 
 ## 6. Documentación Swagger
 
-El backend se encuentra desplegado y accesible públicamente en:
-
-```
-https://equipo27-prediction-backend-production.up.railway.app
-```
-
----
-
-## 6. Documentación Swagger
-
 La documentación oficial de la API se encuentra en Swagger:
 
 * **Producción**:
@@ -220,6 +210,13 @@ POST /api/predict/csv
 
 * Permite cargar un archivo CSV
 * Las filas inválidas **no detienen** el procesamiento completo
+* Formato requerido:
+  • Separador: coma (,)
+  • Columnas: aerolinea,origen,destino,fecha_partida,distancia_km
+  • Fecha formato ISO: YYYY-MM-DDTHH:mm:ss
+  Ejemplo:
+  aerolinea,origen,destino,fecha_partida,distancia_km
+  AA,JFK,MIA,2025-02-15T10:30:00,1759
 
 ---
 
