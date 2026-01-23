@@ -211,13 +211,12 @@ POST /api/predict/csv
 * Permite cargar un archivo CSV
 * Las filas inválidas **no detienen** el procesamiento completo
 * Formato requerido:
-  • Separador: coma (,)
-  • Columnas: aerolinea,origen,destino,fecha_partida,distancia_km
-  • Fecha formato ISO: YYYY-MM-DDTHH:mm:ss
-  Ejemplo:
-  aerolinea,origen,destino,fecha_partida,distancia_km
-  AA,JFK,MIA,2025-02-15T10:30:00,1759
-
+  - Separador: coma (,)
+  - Columnas: aerolinea,origen,destino,fecha_partida,distancia_km
+  - Fecha formato ISO: YYYY-MM-DDTHH:mm:ss
+* Ejemplo:
+  - aerolinea,origen,destino,fecha_partida,distancia_km
+  - AA,JFK,MIA,2025-02-15T10:30:00,1759
 ---
 
 ### 📏 Cálculo de distancia
