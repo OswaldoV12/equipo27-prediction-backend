@@ -1,59 +1,95 @@
-# ✈️ FlightOnTime
+# ✈️ FlightOnTime Backend
 
-## 1. Visión general del proyecto
+*API de predicción de puntualidad de vuelos*
 
-**FlightOnTime** es un proyecto MVP que permite **predecir si un vuelo será Puntual o tendrá Retraso**, devolviendo además la **probabilidad asociada** a dicha predicción.
+---
 
-El objetivo es demostrar la integración entre:
+## 1. Visión general
 
-* Un **modelo de Data Science** entrenado con datos históricos de vuelos
-* Un **backend en Java (Spring Boot)** que expone una API REST para consumir esa predicción
+**FlightOnTime** es un proyecto **MVP educativo y demostrativo** cuyo objetivo es predecir si un vuelo será **Puntual** o tendrá **Retraso**, devolviendo además la **probabilidad asociada** a dicha predicción.
 
-El proyecto fue desarrollado con enfoque educativo y de hackathon, priorizando:
+El proyecto demuestra la integración completa entre:
 
-* Claridad
-* Buenas prácticas
-* Código testeable
-* Respuestas consistentes
+* Un **modelo de Data Science** entrenado con datos históricos de vuelos (microservicio independiente)
+* Un **backend en Java (Spring Boot)** que expone una API REST segura
+* Persistencia de datos para historial, métricas y dashboards
+
+Este repositorio corresponde **exclusivamente al backend**. El microservicio de Data Science y el frontend cuentan con sus propios repositorios y documentación.
+
+El enfoque del proyecto es:
+
+* Claridad y simplicidad
+* Buenas prácticas de arquitectura
+* Código testeable y mantenible
+* Contratos API bien definidos
+* Manejo consistente de errores
 
 ---
 
 ## 2. Arquitectura general
 
 ```
-Cliente (Postman / Swagger)
+Cliente (Frontend / Postman / Swagger)
         ↓
-API REST (Spring Boot)
+API REST (Spring Boot + JWT Security)
         ↓
 Servicio de Predicción
         ↓
-Modelo Data Science (microservicio)
+Microservicio Data Science (HTTP)
         ↓
-Base de Datos (predicciones e historial)
+Base de Datos (H2 / PostgreSQL)
 ```
 
-La API actúa como **puente** entre los datos del vuelo y el modelo predictivo.
+La API actúa como **puente entre los datos del vuelo y el modelo predictivo**, encapsulando validaciones, reglas de negocio, seguridad, persistencia y métricas.
+
+El microservicio de Data Science es **totalmente independiente** y se comunica vía HTTP.
 
 ---
 
 ## 3. Tecnologías utilizadas
 
-* Java 21
-* Spring Boot
+### Backend
+
+* **Java 21**
+* **Spring Boot**
 * Spring Web
 * Spring Data JPA
-* Database (H2 / PostgreSQL)
-* JUnit 5 + Mockito
-* Swagger
+* Spring Security (JWT)
+* Flyway (migraciones de BD)
+
+### Persistencia
+
+* **H2** (entorno de desarrollo)
+* **PostgreSQL** (producción)
+
+### Testing
+
+* JUnit 5
+* Mockito
+
+### Documentación y pruebas
+
+* Swagger / OpenAPI 3
 * Postman
-* Python (para microservicio de Data Science)
+
+### Data Science (externo)
+
+* Python (microservicio independiente)
 
 ---
 
-## 4. Cómo ejecutar el proyecto
+## 4. Ejecución del proyecto
+
+### Requisitos previos
+
+* Java 21
+* Maven
+* IntelliJ IDEA (recomendado, aunque no obligatorio)
+
+### Pasos
 
 1. Clonar el repositorio
-2. Abrir el proyecto en IntelliJ o Eclipse
+2. Abrir el proyecto en IntelliJ IDEA
 3. Verificar el puerto en `application.yml`:
 
 ```yaml
@@ -67,7 +103,7 @@ server:
 PredictionBackendApiApplication.java
 ```
 
-5. La API estará disponible en:
+La API estará disponible en:
 
 ```
 http://localhost:8080
@@ -75,169 +111,255 @@ http://localhost:8080
 
 ---
 
-## 5. Documentación Swagger
+## 5. Entorno productivo
 
-Swagger UI permite explorar y probar la API:
+### Backend
+
+El backend se encuentra desplegado y accesible públicamente en:
+
+```
+https://equipo27-prediction-backend-production.up.railway.app
+```
+
+### Frontend
+
+El proyecto cuenta con un **frontend funcional y listo para usar**, desplegado en Vercel:
+
+```
+https://flightontime-drab.vercel.app/
+```
+
+El frontend consume directamente esta API backend y permite:
+
+* Autenticación de usuarios
+* Envío de predicciones de vuelos
+* Visualización de resultados
+* Acceso a métricas y dashboards
+
+El frontend cuenta con su propio repositorio y README, donde se detallan sus tecnologías y ejecución local.
+
+---
+
+## 6. Documentación Swagger
+
+El backend se encuentra desplegado y accesible públicamente en:
+
+```
+https://equipo27-prediction-backend-production.up.railway.app
+```
+
+---
+
+## 6. Documentación Swagger
+
+La documentación oficial de la API se encuentra en Swagger:
+
+* **Producción**:
+
+  [https://equipo27-prediction-backend-production.up.railway.app/swagger-ui/index.html](https://equipo27-prediction-backend-production.up.railway.app/swagger-ui/index.html)
+
+* **Local**:
 
 ```
 http://localhost:8080/swagger-ui.html
 ```
 
-Desde ahí se puede ejecutar el endpoint `/api/predict` sin usar Postman.
+Swagger es la **fuente de verdad** de todos los endpoints, parámetros y modelos.
 
 ---
 
-## 6. Endpoint principal – Predicción
+## 7. Seguridad y autenticación
 
-### POST /api/predict
+La API utiliza **Spring Security con JWT**.
 
-#### Request (JSON)
+### Endpoints de autenticación
+
+* `POST /auth/register` – Registro de usuario
+* `POST /auth/login` – Login y obtención de token JWT
+* `POST /auth/admin` – Creación de usuarios con rol ADMIN
+* `GET /auth/profile` – Información del usuario autenticado
+
+La mayoría de los endpoints requieren un **Bearer Token** válido.
+
+---
+
+## 8. Endpoints principales
+
+### 🔮 Predicción de vuelos
+
+#### Predicción individual / múltiple
+
+```
+POST /api/predict?explain=false
+```
+
+* Acepta una **lista de vuelos**
+* El parámetro `explain` habilita explicabilidad del modelo DS
+
+**Request (JSON)**
+
+```json
+[
+  {
+    "aerolinea": "AV",
+    "origen": "SJO",
+    "destino": "SYQ",
+    "fecha_partida": "2025-12-25T10:30:00",
+    "distancia_km": 650
+  }
+]
+```
+
+---
+
+#### Predicción vía CSV
+
+```
+POST /api/predict/csv
+```
+
+* Permite cargar un archivo CSV
+* Las filas inválidas **no detienen** el procesamiento completo
+
+---
+
+### 📏 Cálculo de distancia
+
+```
+POST /api/distancia
+```
+
+Calcula la distancia entre dos aeropuertos usando coordenadas geográficas.
+
+---
+
+### 📊 Dashboard
+
+* `GET /api/dashboard/summary` – Resumen global
+* `GET /api/dashboard/history?vueloId=` – Historial por vuelo
+* `GET /api/dashboard/global-history` – Historial global
+
+---
+
+### 📈 Métricas para Data Science
+
+* `GET /api/metrics/ds` – Predicciones completas con métricas
+* `GET /api/metrics/ds-global` – Métricas globales del modelo
+
+Estas métricas permiten **retroalimentación directa** al equipo de Data Science.
+
+---
+
+### ✈️ Catálogos
+
+* `GET /api/aeropuertos`
+* `GET /api/aerolineas`
+
+---
+
+### 👤 Usuarios
+
+* `GET /api/usuario/vuelos` – Vuelos del usuario autenticado
+* `GET /api/admin/usuarios` – Listado de usuarios (ADMIN)
+
+---
+
+## 9. Manejo de errores
+
+La API cuenta con una **estructura centralizada de manejo de errores** usando `@ControllerAdvice`.
+
+Todas las respuestas de error siguen un formato consistente:
 
 ```json
 {
-  "aerolinea": "AZ",
-  "origen": "GIG",
-  "destino": "GRU",
-  "fecha_partida": "2025-11-10T14:30:00",
-  "distancia_km": 350
+  "status": 404,
+  "errorCode": "RESOURCE_NOT_FOUND",
+  "message": "Vuelo no encontrado",
+  "level": "WARN",
+  "path": "/api/dashboard/history"
 }
 ```
 
-#### Validaciones
-
-* Campos obligatorios
-* Tipos de datos correctos
-* Formato de fecha ISO-8601
-* Aerolínea (2 letras)
-* Aeropuertos (3 letras)
-* Origen y destino no pueden ser iguales
-
-#### Response exitoso
-
-```json
-{
-  "prevision": "Retrasado",
-  "probabilidad": 0.78
-}
-```
+* Los errores se devuelven al cliente de forma clara
+* La **traza completa** se registra en consola y archivos de log
+* Se diferencian errores de validación, negocio y sistema
 
 ---
 
-## 7. Manejo de errores
+## 10. Persistencia y base de datos
 
-La API devuelve errores **claros, consistentes y en formato JSON**.
+* **H2** para desarrollo
+* **PostgreSQL** para producción
+* **Flyway** gestiona las migraciones
 
-### Ejemplo – Error de validación
-
-```json
-{
-  "timestamp": "2025-11-10T15:20:30",
-  "status": 400,
-  "error": "Error de validación",
-  "messages": [
-    "destino: El aeropuerto de destino es obligatorio"
-  ],
-  "path": "/predict"
-}
-```
-
-Tipos de errores manejados:
-
-* Campos faltantes
-* Formatos inválidos
-* Tipos de datos incorrectos
-* Errores de negocio
+Esto garantiza consistencia de esquemas entre entornos.
 
 ---
 
-## 8. Flujo de funcionamiento
+## 11. Pruebas unitarias
 
-```
-Request → Validación → Servicio → Modelo → Persistencia → Response
-```
+El proyecto incluye pruebas unitarias con **JUnit 5 y Mockito**.
 
-1. El cliente envía los datos del vuelo
-2. La API valida el request
-3. Se llama al modelo predictivo
-4. Se interpreta la probabilidad
-5. Se guarda el vuelo y la predicción
-6. Se devuelve la respuesta
-
----
-
-## 9. Dashboard y reportes
-
-### Resumen de predicciones
-
-* Total de predicciones
-* Cantidad de vuelos puntuales
-* Cantidad de vuelos con retraso
-* Porcentajes
-
-### Historial
-
-* Historial por vuelo
-* Historial global de todos los vuelos
-
-Estos datos permiten visualizar tendencias y comportamiento del modelo.
-
----
-
-## 10. Pruebas unitarias
-
-El proyecto cuenta con **unit tests usando JUnit y Mockito**:
+### Ejemplos de tests
 
 * `PredictionServiceTest`
 
-    * Validaciones de negocio
-    * Errores del modelo DS
-    * Flujo exitoso
+  * Validaciones de negocio
+  * Errores del modelo DS
+  * Flujos exitosos
 
 * `DashboardServiceTest`
 
-    * Cálculo de métricas
-    * Ordenamiento temporal
-    * Mapeo correcto de datos
+  * Cálculo de métricas
+  * Ordenamiento temporal
+  * Mapeo correcto de datos
 
-Los tests aíslan dependencias externas mediante mocks.
-
----
-
-## 11. Pruebas con Postman
-
-1. Crear request `POST`
-2. URL: `http://localhost:8080/api/predict`
-3. Header: `Content-Type: application/json`
-4. Body → raw → JSON
-5. Enviar request
-
-Se incluyen ejemplos exitosos y de error para validación.
+Las dependencias externas se aíslan mediante mocks.
 
 ---
 
-## 12. Estado del proyecto
+## 12. Pruebas con Postman
 
-✔ MVP funcional
-✔ API REST documentada
-✔ Validaciones completas
-✔ Manejo de errores consistente
-✔ Unit tests implementados
-✔ Listo para demo
+* Método: `POST`
+* URL: `http://localhost:8080/api/predict`
+* Headers: `Content-Type: application/json`
+* Authorization: `Bearer <token>`
 
----
-
-## 13. Posibles mejoras futuras
-
-* Autenticación y seguridad
-* Frontend de visualización (en desarrollo)
+Swagger es el medio recomendado, Postman es opcional.
 
 ---
 
-## 14. Autores
+## 13. Estado del proyecto
 
-**H12-25-L-Equipo 27-Backend**
-  * José Oswaldo Valencia Moreno
-  * Yadir García Córdoba
-  * Brenda Yañez
-  * Maria Vanessa Vaca Lopez
+✔ MVP funcional  
+✔ API REST documentada  
+✔ Seguridad JWT  
+✔ Manejo de errores centralizado  
+✔ Métricas y dashboards  
+✔ Pruebas unitarias  
+✔ Backend desplegado
+
+---
+
+## 14. Posibles mejoras futuras
+
+* Rate limiting
+* Cacheo de predicciones
+* Versionado de la API
+* Seguimiento de predicciones por correo para usuarios registrados (via N8N) [en desarrollo]
+
+---
+
+## 15. Autores
+
+**H12-25-L – Equipo 27 (Backend)**
+
+* José Oswaldo Valencia Moreno
+* Yadir García Córdoba
+* Brenda Yañez
+* Maria Vanessa Vaca Lopez
+
+---
+
+© Proyecto educativo / hackathon
 
